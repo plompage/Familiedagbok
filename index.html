@@ -4,115 +4,149 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Familiedagbok</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Caveat:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      min-height: 100vh;
-      background: #f5ede0;
-      background-image:
-        radial-gradient(ellipse at 20% 10%, rgba(210,170,120,0.18) 0%, transparent 60%),
-        radial-gradient(ellipse at 80% 90%, rgba(180,130,90,0.13) 0%, transparent 60%);
-      font-family: 'Lora', serif;
-    }
-    #login-screen {
-      min-height: 100vh; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; padding: 40px 20px; text-align: center;
-    }
-    .login-book { font-size: 4rem; margin-bottom: 24px; animation: float 3s ease-in-out infinite; }
-    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-    .login-title { font-family: 'Caveat', cursive; font-size: 3.2rem; color: #5c3d1e; margin-bottom: 6px; }
-    .login-subtitle { font-style: italic; color: #a07850; font-size: 0.9rem; margin-bottom: 44px; }
-    .login-btn {
-      display: flex; align-items: center; gap: 12px; padding: 14px 28px;
-      background: #fffdf7; border: 1.5px solid #c8915a; border-radius: 30px;
-      font-family: 'Lora', serif; font-size: 1rem; color: #5c3d1e;
-      cursor: pointer; box-shadow: 0 4px 16px rgba(100,60,20,0.12); transition: all 0.2s;
-      text-decoration: none;
-    }
-    .login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(100,60,20,0.18); }
-    .login-btn:disabled, .login-btn.disabled { opacity: 0.5; cursor: not-allowed; transform: none; pointer-events: none; }
-    .login-note { margin-top: 18px; font-size: 0.78rem; color: #b09070; font-style: italic; max-width: 280px; }
-    .error-box { background: #fff5f0; border: 1px solid #e8b89a; border-radius: 8px; padding: 14px 18px; margin: 0 0 20px; font-size: 0.85rem; color: #7a4020; max-width: 500px; }
-    #app-screen { display: none; }
-    .header { text-align: center; padding: 32px 20px 16px; }
-    .header-title { font-family: 'Caveat', cursive; font-size: 2.8rem; color: #5c3d1e; line-height: 1; }
-    .header-subtitle { font-style: italic; color: #a07850; font-size: 0.85rem; margin-top: 5px; }
-    .header-divider { width: 120px; height: 2px; background: linear-gradient(90deg, transparent, #c8915a, transparent); margin: 12px auto 0; }
-    .user-bar { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px 20px 0; font-size: 0.82rem; color: #a07850; flex-wrap: wrap; }
-    .user-name { font-family: 'Caveat', cursive; font-size: 1.05rem; color: #7a5230; background: rgba(200,145,90,0.15); padding: 3px 12px; border-radius: 12px; border: 1px solid rgba(200,145,90,0.3); }
-    .signout-btn { background: transparent; border: 1px solid #c8a882; border-radius: 12px; padding: 3px 10px; font-family: 'Lora', serif; font-size: 0.75rem; color: #a07850; cursor: pointer; }
-    .signout-btn:hover { background: rgba(200,145,90,0.1); }
-    .sync-bar { text-align: center; font-size: 0.75rem; color: #b09070; font-style: italic; padding: 6px 0 0; }
-    .sync-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #a8c890; margin-right: 5px; vertical-align: middle; }
-    .sync-dot.syncing { background: #c8b870; animation: pulse 1s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-    .new-entry-wrapper { max-width: 640px; margin: 22px auto 0; padding: 0 16px; }
-    .new-entry-card { background: #fffdf7; border-radius: 4px; box-shadow: 0 2px 12px rgba(100,60,20,0.1), 0 0 0 1px rgba(180,130,80,0.12); padding: 22px 26px 18px; position: relative; overflow: hidden; }
-    .new-entry-card::before { content:''; position:absolute; left:50px; top:0; bottom:0; width:1px; background:rgba(220,100,80,0.22); z-index:0; }
-    .new-entry-card::after { content:''; position:absolute; inset:0; background-image:repeating-linear-gradient(transparent,transparent 27px,rgba(180,150,110,0.13) 27px,rgba(180,150,110,0.13) 28px); pointer-events:none; z-index:0; }
-    .new-entry-label { font-family:'Caveat',cursive; font-size:1.15rem; color:#a07040; margin-bottom:10px; padding-left:44px; position:relative; z-index:1; }
-    #entry-textarea { width:100%; min-height:120px; background:transparent; border:none; outline:none; resize:none; font-family:'Lora',serif; font-size:0.95rem; color:#3d2b14; line-height:28px; padding-left:44px; position:relative; z-index:1; }
-    #entry-textarea::placeholder { color:#c4a882; }
-    .tag-selector { display:flex; gap:8px; padding-left:44px; margin-top:12px; position:relative; z-index:1; flex-wrap:wrap; }
-    .tag-selector-label { font-size:0.78rem; color:#a07850; font-style:italic; align-self:center; }
-    .tag-btn { padding:4px 14px; border-radius:16px; border:1.5px solid #c8a87a; background:transparent; font-family:'Lora',serif; font-size:0.8rem; color:#7a5230; cursor:pointer; transition:all 0.15s; }
-    .tag-btn.active { background:#c8915a; color:white; border-color:#c8915a; }
-    .tag-btn:hover:not(.active) { background:rgba(200,145,90,0.12); }
-    .entry-actions { display:flex; align-items:center; justify-content:space-between; margin-top:12px; padding-left:44px; position:relative; z-index:1; }
-    .photo-label { display:flex; align-items:center; gap:6px; font-size:0.8rem; color:#a07850; cursor:pointer; padding:6px 12px; border-radius:16px; border:1px dashed #c8a87a; transition:all 0.2s; }
-    .photo-label:hover { background:rgba(200,168,122,0.1); }
-    #photo-count { background:#c8915a; color:white; border-radius:10px; font-size:0.68rem; padding:1px 6px; font-family:'Caveat',cursive; display:none; }
-    .submit-btn { padding:8px 20px; background:#7a5230; color:#f5ede0; border:none; border-radius:20px; font-family:'Lora',serif; font-size:0.85rem; cursor:pointer; transition:all 0.2s; box-shadow:0 2px 6px rgba(100,60,20,0.2); }
-    .submit-btn:hover { background:#5c3d1e; transform:translateY(-1px); }
-    .submit-btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
-    #photo-previews { display:flex; flex-wrap:wrap; gap:8px; padding-left:44px; margin-top:10px; position:relative; z-index:1; }
-    .photo-thumb-wrap { position:relative; }
-    .photo-thumb { width:60px; height:60px; object-fit:cover; border-radius:4px; border:2px solid #e8d5b8; }
-    .photo-remove { position:absolute; top:-6px; right:-6px; width:18px; height:18px; background:#7a5230; color:white; border-radius:50%; border:none; font-size:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-    .filter-bar { max-width:640px; margin:22px auto 0; padding:0 16px; }
-    .filter-card { background:#fffdf7; border-radius:4px; box-shadow:0 1px 8px rgba(100,60,20,0.07),0 0 0 1px rgba(180,130,80,0.1); padding:16px 20px; }
-    .filter-title { font-family:'Caveat',cursive; font-size:1.05rem; color:#a07040; margin-bottom:12px; }
-    .filter-row { display:flex; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
-    .filter-row-label { font-size:0.78rem; color:#a07850; font-style:italic; min-width:60px; }
-    .filter-tag-btn { padding:3px 12px; border-radius:14px; border:1.5px solid #c8a87a; background:transparent; font-family:'Lora',serif; font-size:0.78rem; color:#7a5230; cursor:pointer; transition:all 0.15s; }
-    .filter-tag-btn.active { background:#c8915a; color:white; border-color:#c8915a; }
-    .filter-tag-btn:hover:not(.active) { background:rgba(200,145,90,0.12); }
-    .date-inputs { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-    .date-input { padding:4px 8px; border:1px solid #c8a87a; border-radius:8px; font-family:'Lora',serif; font-size:0.78rem; color:#5c3d1e; background:#fffdf7; }
-    .date-sep { color:#a07850; font-size:0.78rem; }
-    .filter-clear { padding:3px 12px; border-radius:14px; border:1px solid #c8a882; background:transparent; font-family:'Lora',serif; font-size:0.75rem; color:#a07850; cursor:pointer; margin-left:auto; }
-    .filter-clear:hover { background:rgba(200,145,90,0.1); }
-    .entries-section { max-width:640px; margin:20px auto 60px; padding:0 16px; }
-    .entries-header { font-family:'Caveat',cursive; font-size:1.35rem; color:#a07040; text-align:center; margin-bottom:18px; }
-    .entries-count { text-align:center; font-size:0.78rem; color:#b09070; font-style:italic; margin-bottom:14px; }
-    .entry-card { background:#fffdf7; border-radius:4px; box-shadow:0 2px 10px rgba(100,60,20,0.08),0 0 0 1px rgba(180,130,80,0.1); margin-bottom:18px; overflow:hidden; animation:fadeIn 0.4s ease; position:relative; }
-    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-    .entry-body { padding:16px 20px 16px 56px; position:relative; }
-    .entry-body::before { content:''; position:absolute; left:44px; top:0; bottom:0; width:1px; background:rgba(220,100,80,0.2); }
-    .entry-body::after { content:''; position:absolute; inset:0; background-image:repeating-linear-gradient(transparent,transparent 27px,rgba(180,150,110,0.1) 27px,rgba(180,150,110,0.1) 28px); pointer-events:none; }
-    .entry-meta { display:flex; align-items:center; gap:8px; margin-bottom:7px; position:relative; z-index:1; flex-wrap:wrap; }
-    .entry-author-badge { font-family:'Caveat',cursive; font-size:0.95rem; font-weight:600; color:#7a5230; background:rgba(200,145,90,0.15); padding:2px 10px; border-radius:12px; border:1px solid rgba(200,145,90,0.3); }
-    .entry-tag { font-family:'Caveat',cursive; font-size:0.85rem; padding:1px 9px; border-radius:10px; }
-    .entry-tag.Liv { background:#fde8f0; color:#b05070; border:1px solid #f0b8cc; }
-    .entry-tag.Lara { background:#e8f0fd; color:#4060b0; border:1px solid #b8ccf0; }
-    .entry-tag.Felles { background:#e8fde8; color:#407040; border:1px solid #b8e8b8; }
-    .entry-date { font-size:0.75rem; color:#b09070; font-style:italic; }
-    .entry-text { font-size:0.93rem; color:#3d2b14; line-height:28px; white-space:pre-wrap; position:relative; z-index:1; }
-    .entry-photos { display:flex; flex-wrap:wrap; gap:8px; padding:8px 20px 14px 56px; }
-    .entry-photo { width:85px; height:85px; object-fit:cover; border-radius:4px; border:2px solid #e8d5b8; box-shadow:2px 3px 8px rgba(0,0,0,0.12); cursor:pointer; transition:transform 0.15s; }
-    .entry-photo:hover { transform:scale(1.05) rotate(1deg); }
-    .entry-delete { position:absolute; top:10px; right:10px; background:transparent; border:none; color:#c8a882; font-size:0.78rem; cursor:pointer; opacity:0; transition:opacity 0.2s; z-index:2; padding:4px 6px; }
-    .entry-card:hover .entry-delete { opacity:1; }
-    #lightbox { display:none; position:fixed; inset:0; background:rgba(30,15,5,0.88); z-index:10000; align-items:center; justify-content:center; cursor:pointer; }
-    #lightbox.active { display:flex; }
-    #lightbox img { max-width:90vw; max-height:85vh; border-radius:4px; cursor:default; }
-    #lightbox-close { position:absolute; top:20px; right:24px; background:transparent; border:none; color:#e8d5b8; font-size:2rem; cursor:pointer; }
-    #toast { display:none; position:fixed; bottom:28px; left:50%; transform:translateX(-50%); background:#5c3d1e; color:#f5ede0; padding:10px 22px; border-radius:20px; font-size:0.86rem; z-index:10001; white-space:nowrap; box-shadow:0 4px 16px rgba(0,0,0,0.2); }
-    .loading { text-align:center; padding:40px; color:#b09070; font-style:italic; }
-    .empty-state { text-align:center; padding:40px 20px; color:#b09070; font-style:italic; }
-    .empty-icon { font-size:2.5rem; display:block; margin-bottom:12px; opacity:0.5; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{min-height:100vh;background:#f5ede0;background-image:radial-gradient(ellipse at 20% 10%,rgba(210,170,120,.18) 0%,transparent 60%),radial-gradient(ellipse at 80% 90%,rgba(180,130,90,.13) 0%,transparent 60%);font-family:'Lora',serif}
+    #login-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center}
+    .login-book{font-size:4rem;margin-bottom:24px;animation:float 3s ease-in-out infinite}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    .login-title{font-family:'Caveat',cursive;font-size:3.2rem;color:#5c3d1e;margin-bottom:6px}
+    .login-subtitle{font-style:italic;color:#a07850;font-size:.9rem;margin-bottom:44px}
+    .login-btn{display:flex;align-items:center;gap:12px;padding:14px 28px;background:#fffdf7;border:1.5px solid #c8915a;border-radius:30px;font-family:'Lora',serif;font-size:1rem;color:#5c3d1e;cursor:pointer;box-shadow:0 4px 16px rgba(100,60,20,.12);transition:all .2s}
+    .login-btn:hover{transform:translateY(-2px)}
+    .login-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .login-note{margin-top:18px;font-size:.78rem;color:#b09070;font-style:italic;max-width:280px}
+    .error-box{background:#fff5f0;border:1px solid #e8b89a;border-radius:8px;padding:14px 18px;margin:0 0 20px;font-size:.85rem;color:#7a4020;max-width:500px}
+    #app-screen{display:none}
+    .header{text-align:center;padding:32px 20px 16px}
+    .header-title{font-family:'Caveat',cursive;font-size:2.8rem;color:#5c3d1e;line-height:1}
+    .header-subtitle{font-style:italic;color:#a07850;font-size:.85rem;margin-top:5px}
+    .header-divider{width:120px;height:2px;background:linear-gradient(90deg,transparent,#c8915a,transparent);margin:12px auto 0}
+    .user-bar{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 20px 0;font-size:.82rem;color:#a07850;flex-wrap:wrap}
+    .user-name{font-family:'Caveat',cursive;font-size:1.05rem;color:#7a5230;background:rgba(200,145,90,.15);padding:3px 12px;border-radius:12px;border:1px solid rgba(200,145,90,.3)}
+    .signout-btn{background:transparent;border:1px solid #c8a882;border-radius:12px;padding:3px 10px;font-family:'Lora',serif;font-size:.75rem;color:#a07850;cursor:pointer}
+    .signout-btn:hover{background:rgba(200,145,90,.1)}
+    .sync-bar{text-align:center;font-size:.75rem;color:#b09070;font-style:italic;padding:6px 0 0}
+    .sync-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#a8c890;margin-right:5px;vertical-align:middle}
+    .sync-dot.syncing{background:#c8b870;animation:pulse 1s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    .view-tabs{display:flex;justify-content:center;gap:8px;padding:16px 20px 0;max-width:640px;margin:0 auto}
+    .view-tab{padding:7px 20px;border-radius:20px;border:1.5px solid #c8a87a;background:transparent;font-family:'Lora',serif;font-size:.85rem;color:#7a5230;cursor:pointer;transition:all .15s}
+    .view-tab.active{background:#7a5230;color:#f5ede0;border-color:#7a5230}
+    .view-tab:hover:not(.active){background:rgba(200,145,90,.12)}
+    .new-entry-wrapper{max-width:640px;margin:22px auto 0;padding:0 16px}
+    .new-entry-card{background:#fffdf7;border-radius:4px;box-shadow:0 2px 12px rgba(100,60,20,.1),0 0 0 1px rgba(180,130,80,.12);padding:22px 26px 18px;position:relative;overflow:hidden}
+    .new-entry-card::before{content:'';position:absolute;left:50px;top:0;bottom:0;width:1px;background:rgba(220,100,80,.22);z-index:0}
+    .new-entry-card::after{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(transparent,transparent 27px,rgba(180,150,110,.13) 27px,rgba(180,150,110,.13) 28px);pointer-events:none;z-index:0}
+    .new-entry-label{font-family:'Caveat',cursive;font-size:1.15rem;color:#a07040;margin-bottom:10px;padding-left:44px;position:relative;z-index:1}
+    #entry-textarea{width:100%;min-height:120px;background:transparent;border:none;outline:none;resize:none;font-family:'Lora',serif;font-size:.95rem;color:#3d2b14;line-height:28px;padding-left:44px;position:relative;z-index:1}
+    #entry-textarea::placeholder{color:#c4a882}
+    .tag-selector{display:flex;gap:8px;padding-left:44px;margin-top:12px;position:relative;z-index:1;flex-wrap:wrap;align-items:center}
+    .tag-selector-label{font-size:.78rem;color:#a07850;font-style:italic}
+    .tag-btn{padding:4px 14px;border-radius:16px;border:1.5px solid #c8a87a;background:transparent;font-family:'Lora',serif;font-size:.8rem;color:#7a5230;cursor:pointer;transition:all .15s}
+    .tag-btn.active{background:#c8915a;color:white;border-color:#c8915a}
+    .tag-btn:hover:not(.active){background:rgba(200,145,90,.12)}
+    .entry-actions{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-left:44px;position:relative;z-index:1;flex-wrap:wrap;gap:8px}
+    .photo-label{display:flex;align-items:center;gap:6px;font-size:.8rem;color:#a07850;cursor:pointer;padding:6px 12px;border-radius:16px;border:1px dashed #c8a87a;transition:all .2s}
+    .photo-label:hover{background:rgba(200,168,122,.1)}
+    #photo-count{background:#c8915a;color:white;border-radius:10px;font-size:.68rem;padding:1px 6px;font-family:'Caveat',cursive;display:none}
+    .location-info{font-size:.75rem;color:#a07850;font-style:italic;padding-left:44px;margin-top:6px;position:relative;z-index:1}
+    .submit-btn{padding:8px 20px;background:#7a5230;color:#f5ede0;border:none;border-radius:20px;font-family:'Lora',serif;font-size:.85rem;cursor:pointer;transition:all .2s;box-shadow:0 2px 6px rgba(100,60,20,.2)}
+    .submit-btn:hover{background:#5c3d1e;transform:translateY(-1px)}
+    .submit-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+    #photo-previews{display:flex;flex-wrap:wrap;gap:8px;padding-left:44px;margin-top:10px;position:relative;z-index:1}
+    .photo-thumb-wrap{position:relative}
+    .photo-thumb{width:60px;height:60px;object-fit:cover;border-radius:4px;border:2px solid #e8d5b8}
+    .photo-remove{position:absolute;top:-6px;right:-6px;width:18px;height:18px;background:#7a5230;color:white;border-radius:50%;border:none;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .filter-bar{max-width:640px;margin:22px auto 0;padding:0 16px}
+    .filter-card{background:#fffdf7;border-radius:4px;box-shadow:0 1px 8px rgba(100,60,20,.07),0 0 0 1px rgba(180,130,80,.1);padding:16px 20px}
+    .filter-title{font-family:'Caveat',cursive;font-size:1.05rem;color:#a07040;margin-bottom:12px}
+    .filter-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+    .filter-row-label{font-size:.78rem;color:#a07850;font-style:italic;min-width:60px}
+    .filter-tag-btn{padding:3px 12px;border-radius:14px;border:1.5px solid #c8a87a;background:transparent;font-family:'Lora',serif;font-size:.78rem;color:#7a5230;cursor:pointer;transition:all .15s}
+    .filter-tag-btn.active{background:#c8915a;color:white;border-color:#c8915a}
+    .filter-tag-btn:hover:not(.active){background:rgba(200,145,90,.12)}
+    .date-inputs{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .date-input{padding:4px 8px;border:1px solid #c8a87a;border-radius:8px;font-family:'Lora',serif;font-size:.78rem;color:#5c3d1e;background:#fffdf7}
+    .date-sep{color:#a07850;font-size:.78rem}
+    .filter-clear{padding:3px 12px;border-radius:14px;border:1px solid #c8a882;background:transparent;font-family:'Lora',serif;font-size:.75rem;color:#a07850;cursor:pointer;margin-left:auto}
+    .filter-clear:hover{background:rgba(200,145,90,.1)}
+    .entries-section{max-width:640px;margin:20px auto 60px;padding:0 16px}
+    .entries-header{font-family:'Caveat',cursive;font-size:1.35rem;color:#a07040;text-align:center;margin-bottom:18px}
+    .entries-count{text-align:center;font-size:.78rem;color:#b09070;font-style:italic;margin-bottom:14px}
+    .entry-card{background:#fffdf7;border-radius:4px;box-shadow:0 2px 10px rgba(100,60,20,.08),0 0 0 1px rgba(180,130,80,.1);margin-bottom:18px;overflow:hidden;animation:fadeIn .4s ease;position:relative}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .entry-body{padding:16px 20px 16px 56px;position:relative}
+    .entry-body::before{content:'';position:absolute;left:44px;top:0;bottom:0;width:1px;background:rgba(220,100,80,.2)}
+    .entry-body::after{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(transparent,transparent 27px,rgba(180,150,110,.1) 27px,rgba(180,150,110,.1) 28px);pointer-events:none}
+    .entry-meta{display:flex;align-items:center;gap:8px;margin-bottom:7px;position:relative;z-index:1;flex-wrap:wrap}
+    .entry-author-badge{font-family:'Caveat',cursive;font-size:.95rem;font-weight:600;color:#7a5230;background:rgba(200,145,90,.15);padding:2px 10px;border-radius:12px;border:1px solid rgba(200,145,90,.3)}
+    .entry-tag{font-family:'Caveat',cursive;font-size:.85rem;padding:1px 9px;border-radius:10px}
+    .entry-tag.Liv{background:#fde8f0;color:#b05070;border:1px solid #f0b8cc}
+    .entry-tag.Lara{background:#e8f0fd;color:#4060b0;border:1px solid #b8ccf0}
+    .entry-tag.Felles{background:#e8fde8;color:#407040;border:1px solid #b8e8b8}
+    .entry-date{font-size:.75rem;color:#b09070;font-style:italic}
+    .entry-location{font-size:.72rem;color:#b09070;font-style:italic}
+    .entry-text{font-size:.93rem;color:#3d2b14;line-height:28px;white-space:pre-wrap;position:relative;z-index:1}
+    .entry-edit-history{font-size:.72rem;color:#b09070;font-style:italic;margin-top:6px;position:relative;z-index:1;border-top:1px solid rgba(180,150,110,.2);padding-top:6px}
+    .entry-photos{display:flex;flex-wrap:wrap;gap:8px;padding:8px 20px 14px 56px}
+    .entry-photo{width:85px;height:85px;object-fit:cover;border-radius:4px;border:2px solid #e8d5b8;box-shadow:2px 3px 8px rgba(0,0,0,.12);cursor:pointer;transition:transform .15s}
+    .entry-photo:hover{transform:scale(1.05) rotate(1deg)}
+    .entry-actions-bar{display:flex;gap:8px;padding:0 20px 12px 56px}
+    .edit-btn{padding:3px 12px;border-radius:12px;border:1px solid #c8a87a;background:transparent;font-family:'Lora',serif;font-size:.75rem;color:#7a5230;cursor:pointer}
+    .edit-btn:hover{background:rgba(200,145,90,.12)}
+    .delete-btn{padding:3px 12px;border-radius:12px;border:1px solid #e8b8b8;background:transparent;font-family:'Lora',serif;font-size:.75rem;color:#b07070;cursor:pointer}
+    .delete-btn:hover{background:rgba(220,100,80,.08)}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(30,15,5,.6);z-index:9000;align-items:center;justify-content:center;padding:20px}
+    .modal-overlay.active{display:flex}
+    .modal{background:#fffdf7;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,.2);padding:28px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;position:relative}
+    .modal-title{font-family:'Caveat',cursive;font-size:1.5rem;color:#5c3d1e;margin-bottom:20px}
+    .modal-field{margin-bottom:16px}
+    .modal-label{font-size:.8rem;color:#a07850;font-style:italic;margin-bottom:6px;display:block}
+    .modal-textarea{width:100%;min-height:120px;border:1px solid #c8a87a;border-radius:6px;padding:10px;font-family:'Lora',serif;font-size:.93rem;color:#3d2b14;resize:vertical;background:#fffdf7;outline:none}
+    .modal-date-input{padding:6px 10px;border:1px solid #c8a87a;border-radius:6px;font-family:'Lora',serif;font-size:.85rem;color:#5c3d1e;background:#fffdf7}
+    .modal-tag-row{display:flex;gap:8px;flex-wrap:wrap}
+    .modal-photos-preview{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .modal-photo-wrap{position:relative}
+    .modal-photo-thumb{width:70px;height:70px;object-fit:cover;border-radius:4px;border:2px solid #e8d5b8}
+    .modal-photo-remove{position:absolute;top:-6px;right:-6px;width:18px;height:18px;background:#7a5230;color:white;border-radius:50%;border:none;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .modal-add-photo{display:flex;align-items:center;gap:6px;font-size:.8rem;color:#a07850;cursor:pointer;padding:6px 12px;border-radius:16px;border:1px dashed #c8a87a;margin-top:8px;width:fit-content}
+    .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+    .modal-cancel{padding:8px 20px;background:transparent;border:1.5px solid #c8a87a;border-radius:20px;font-family:'Lora',serif;font-size:.85rem;color:#7a5230;cursor:pointer}
+    .modal-save{padding:8px 20px;background:#7a5230;color:#f5ede0;border:none;border-radius:20px;font-family:'Lora',serif;font-size:.85rem;cursor:pointer}
+    .modal-save:hover{background:#5c3d1e}
+    .modal-close{position:absolute;top:14px;right:16px;background:transparent;border:none;font-size:1.4rem;color:#c8a882;cursor:pointer}
+    #calendar-view{display:none;max-width:640px;margin:22px auto 60px;padding:0 16px}
+    .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .cal-title{font-family:'Caveat',cursive;font-size:1.6rem;color:#5c3d1e}
+    .cal-nav{background:transparent;border:1.5px solid #c8a87a;border-radius:20px;padding:4px 14px;font-family:'Lora',serif;font-size:.85rem;color:#7a5230;cursor:pointer}
+    .cal-nav:hover{background:rgba(200,145,90,.12)}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+    .cal-day-name{text-align:center;font-size:.72rem;color:#a07850;font-style:italic;padding:4px 0}
+    .cal-day{min-height:48px;border-radius:4px;padding:4px;cursor:pointer;transition:all .15s;position:relative;background:#fffdf7;border:1px solid rgba(180,130,80,.1)}
+    .cal-day:hover{background:rgba(200,145,90,.1)}
+    .cal-day.other-month{opacity:.35}
+    .cal-day.today{border-color:#c8915a;border-width:2px}
+    .cal-day.selected{background:rgba(200,145,90,.2);border-color:#c8915a}
+    .cal-day.has-entries{background:#fff8ee}
+    .cal-day-num{font-size:.8rem;color:#5c3d1e;font-weight:600}
+    .cal-dots{display:flex;flex-wrap:wrap;gap:2px;margin-top:3px}
+    .cal-dot{width:6px;height:6px;border-radius:50%}
+    .cal-dot.Felles{background:#68a068}
+    .cal-dot.Liv{background:#c870a0}
+    .cal-dot.Lara{background:#6080c8}
+    .cal-dot.unknown{background:#c8a87a}
+    .cal-selected-entries{margin-top:20px}
+    .cal-selected-title{font-family:'Caveat',cursive;font-size:1.2rem;color:#a07040;margin-bottom:12px}
+    #lightbox{display:none;position:fixed;inset:0;background:rgba(30,15,5,.88);z-index:10000;align-items:center;justify-content:center;cursor:pointer}
+    #lightbox.active{display:flex}
+    #lightbox img{max-width:90vw;max-height:85vh;border-radius:4px;cursor:default}
+    #lightbox-close{position:absolute;top:20px;right:24px;background:transparent;border:none;color:#e8d5b8;font-size:2rem;cursor:pointer}
+    #toast{display:none;position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#5c3d1e;color:#f5ede0;padding:10px 22px;border-radius:20px;font-size:.86rem;z-index:10001;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+    .loading{text-align:center;padding:40px;color:#b09070;font-style:italic}
+    .empty-state{text-align:center;padding:40px 20px;color:#b09070;font-style:italic}
+    .empty-icon{font-size:2.5rem;display:block;margin-bottom:12px;opacity:.5}
   </style>
 </head>
 <body>
@@ -123,15 +157,10 @@
   <div class="login-subtitle">Våre minner, side for side</div>
   <div id="login-error" class="error-box" style="display:none"></div>
   <button class="login-btn" id="login-btn" onclick="handleLogin()">
-    <svg width="20" height="20" viewBox="0 0 24 24">
-      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-    </svg>
+    <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
     Logg inn med Google
   </button>
-  <div class="login-note">Innleggene lagres i en mappe kalt «Familiedagbok» på din Google Drive.</div>
+  <div class="login-note">Innleggene lagres på din Google Drive.</div>
 </div>
 
 <div id="app-screen">
@@ -145,60 +174,105 @@
     <span class="user-name" id="user-name-display">✍️</span>
     <button class="signout-btn" onclick="handleSignOut()">Logg ut</button>
   </div>
-  <div class="sync-bar">
-    <span class="sync-dot" id="sync-dot"></span>
-    <span id="sync-label">Klar</span>
-  </div>
-  <div id="app-error" class="error-box" style="display:none;max-width:608px;margin:12px auto;"></div>
+  <div class="sync-bar"><span class="sync-dot" id="sync-dot"></span><span id="sync-label">Klar</span></div>
+  <div id="app-error" class="error-box" style="display:none;max-width:608px;margin:12px auto"></div>
 
-  <div class="new-entry-wrapper">
-    <div class="new-entry-card">
-      <div class="new-entry-label">Skriv dagens tanker...</div>
-      <textarea id="entry-textarea" placeholder="Det skjedde noe fint i dag..."></textarea>
-      <div class="tag-selector">
-        <span class="tag-selector-label">Tagg:</span>
-        <button class="tag-btn" id="tag-Felles" onclick="selectTag('Felles')">🌿 Felles</button>
-        <button class="tag-btn" id="tag-Liv" onclick="selectTag('Liv')">🌸 Liv</button>
-        <button class="tag-btn" id="tag-Lara" onclick="selectTag('Lara')">⭐ Lara</button>
-      </div>
-      <div id="photo-previews"></div>
-      <div class="entry-actions">
-        <label class="photo-label">
-          📷 Legg til bilder
-          <span id="photo-count"></span>
-          <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="handlePhotos(this)" />
-        </label>
-        <button class="submit-btn" id="submit-btn" onclick="handleSubmit()">Skriv inn ✦</button>
-      </div>
-    </div>
+  <div class="view-tabs">
+    <button class="view-tab active" id="tab-list" onclick="switchView('list')">📋 Innlegg</button>
+    <button class="view-tab" id="tab-calendar" onclick="switchView('calendar')">📅 Kalender</button>
   </div>
 
-  <div class="filter-bar">
-    <div class="filter-card">
-      <div class="filter-title">🔍 Filtrer innlegg</div>
-      <div class="filter-row">
-        <span class="filter-row-label">Tagg:</span>
-        <button class="filter-tag-btn active" id="ftag-Alle" onclick="setFilterTag('Alle')">Alle</button>
-        <button class="filter-tag-btn" id="ftag-Felles" onclick="setFilterTag('Felles')">🌿 Felles</button>
-        <button class="filter-tag-btn" id="ftag-Liv" onclick="setFilterTag('Liv')">🌸 Liv</button>
-        <button class="filter-tag-btn" id="ftag-Lara" onclick="setFilterTag('Lara')">⭐ Lara</button>
-      </div>
-      <div class="filter-row">
-        <span class="filter-row-label">Dato:</span>
-        <div class="date-inputs">
-          <input type="date" class="date-input" id="filter-from" onchange="renderEntries()" />
-          <span class="date-sep">→</span>
-          <input type="date" class="date-input" id="filter-to" onchange="renderEntries()" />
+  <div id="list-view">
+    <div class="new-entry-wrapper">
+      <div class="new-entry-card">
+        <div class="new-entry-label">Skriv dagens tanker...</div>
+        <textarea id="entry-textarea" placeholder="Det skjedde noe fint i dag..."></textarea>
+        <div class="tag-selector">
+          <span class="tag-selector-label">Tagg:</span>
+          <button class="tag-btn" id="tag-Felles" onclick="selectTag('Felles')">🌿 Felles</button>
+          <button class="tag-btn" id="tag-Liv" onclick="selectTag('Liv')">🌸 Liv</button>
+          <button class="tag-btn" id="tag-Lara" onclick="selectTag('Lara')">⭐ Lara</button>
         </div>
-        <button class="filter-clear" onclick="clearFilters()">Nullstill</button>
+        <div id="photo-previews"></div>
+        <div id="location-info" class="location-info"></div>
+        <div class="entry-actions">
+          <label class="photo-label">📷 Bilder <span id="photo-count"></span>
+            <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="handlePhotos(this)" />
+          </label>
+          <button class="submit-btn" id="submit-btn" onclick="handleSubmit()">Skriv inn ✦</button>
+        </div>
       </div>
+    </div>
+    <div class="filter-bar">
+      <div class="filter-card">
+        <div class="filter-title">🔍 Filtrer innlegg</div>
+        <div class="filter-row">
+          <span class="filter-row-label">Tagg:</span>
+          <button class="filter-tag-btn active" id="ftag-Alle" onclick="setFilterTag('Alle')">Alle</button>
+          <button class="filter-tag-btn" id="ftag-Felles" onclick="setFilterTag('Felles')">🌿 Felles</button>
+          <button class="filter-tag-btn" id="ftag-Liv" onclick="setFilterTag('Liv')">🌸 Liv</button>
+          <button class="filter-tag-btn" id="ftag-Lara" onclick="setFilterTag('Lara')">⭐ Lara</button>
+        </div>
+        <div class="filter-row">
+          <span class="filter-row-label">Dato:</span>
+          <div class="date-inputs">
+            <input type="date" class="date-input" id="filter-from" onchange="renderEntries()" />
+            <span class="date-sep">→</span>
+            <input type="date" class="date-input" id="filter-to" onchange="renderEntries()" />
+          </div>
+          <button class="filter-clear" onclick="clearFilters()">Nullstill</button>
+        </div>
+      </div>
+    </div>
+    <div class="entries-section">
+      <div class="entries-header">— Våre innlegg —</div>
+      <div id="entries-count" class="entries-count"></div>
+      <div id="entries-list"><div class="loading">Laster dagboken fra Drive...</div></div>
     </div>
   </div>
 
-  <div class="entries-section">
-    <div class="entries-header">— Våre innlegg —</div>
-    <div id="entries-count" class="entries-count"></div>
-    <div id="entries-list"><div class="loading">Laster dagboken fra Drive...</div></div>
+  <div id="calendar-view">
+    <div class="cal-header">
+      <button class="cal-nav" onclick="calPrev()">← Forrige</button>
+      <div class="cal-title" id="cal-title"></div>
+      <button class="cal-nav" onclick="calNext()">Neste →</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-selected-entries" id="cal-selected-entries"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeEditModal()">✕</button>
+    <div class="modal-title">✏️ Rediger innlegg</div>
+    <div class="modal-field">
+      <label class="modal-label">Tekst</label>
+      <textarea class="modal-textarea" id="modal-text"></textarea>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Tagg</label>
+      <div class="modal-tag-row">
+        <button class="tag-btn" id="modal-tag-Felles" onclick="selectModalTag('Felles')">🌿 Felles</button>
+        <button class="tag-btn" id="modal-tag-Liv" onclick="selectModalTag('Liv')">🌸 Liv</button>
+        <button class="tag-btn" id="modal-tag-Lara" onclick="selectModalTag('Lara')">⭐ Lara</button>
+      </div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Dato og tid</label>
+      <input type="datetime-local" class="modal-date-input" id="modal-date" />
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Bilder</label>
+      <div class="modal-photos-preview" id="modal-photos-preview"></div>
+      <label class="modal-add-photo">📷 Legg til bilder
+        <input type="file" accept="image/*" multiple style="display:none" onchange="handleModalPhotos(this)" />
+      </label>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-cancel" onclick="closeEditModal()">Avbryt</button>
+      <button class="modal-save" onclick="saveEdit()">Lagre endringer</button>
+    </div>
   </div>
 </div>
 
@@ -209,321 +283,274 @@
 <div id="toast"></div>
 
 <script>
-  const CLIENT_ID = "885648821523-iadmhinq9a8lfj7249cqs6aapqej6pap.apps.googleusercontent.com";
-  const REDIRECT_URI = "https://plompage.github.io/Familiedagbok/";
-  const SCOPES = "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile";
-  const FOLDER_NAME = "Familiedagbok";
-  const ENTRIES_FILE = "dagbok-entries.json";
-  const AUTHOR_MAP = {
-    "plompage@gmail.com": "Erik",
-    "mialunder@gmail.com": "Mia"
-  };
+const CLIENT_ID="885648821523-iadmhinq9a8lfj7249cqs6aapqej6pap.apps.googleusercontent.com";
+const REDIRECT_URI="https://plompage.github.io/Familiedagbok/";
+const SCOPES="https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile";
+const FOLDER_NAME="Familiedagbok";
+const ENTRIES_FILE="dagbok-entries.json";
+const AUTHOR_MAP={"plompage@gmail.com":"Erik","mialunder@gmail.com":"Mia"};
 
-  let accessToken = null;
-  let userName = "";
-  let folderId = null;
-  let fileId = null;
-  let entries = [];
-  let pendingPhotos = [];
-  let selectedTag = "Felles";
-  let filterTag = "Alle";
-  let syncInterval = null;
+let accessToken=null,userName="",folderId=null,fileId=null;
+let entries=[],pendingPhotos=[],selectedTag="Felles",filterTag="Alle";
+let syncInterval=null,currentView="list";
+let calYear=new Date().getFullYear(),calMonth=new Date().getMonth(),calSelectedDate=null;
+let editingId=null,modalPhotos=[],modalTag="Felles";
+let currentLocation=null;
 
-  // ---- OAUTH REDIRECT FLOW ----
-  function handleLogin() {
-    const state = Math.random().toString(36).substring(2);
-    sessionStorage.setItem("oauth_state", state);
-    const params = new URLSearchParams({
-      client_id: CLIENT_ID,
-      redirect_uri: REDIRECT_URI,
-      response_type: "token",
-      scope: SCOPES,
-      state: state,
-      include_granted_scopes: "true"
-    });
-    window.location.href = "https://accounts.google.com/o/oauth2/v2/auth?" + params.toString();
-  }
+function handleLogin(){
+  const state=Math.random().toString(36).substring(2);
+  sessionStorage.setItem("oauth_state",state);
+  const p=new URLSearchParams({client_id:CLIENT_ID,redirect_uri:REDIRECT_URI,response_type:"token",scope:SCOPES,state,include_granted_scopes:"true"});
+  window.location.href="https://accounts.google.com/o/oauth2/v2/auth?"+p;
+}
+function handleSignOut(){
+  if(accessToken) fetch("https://oauth2.googleapis.com/revoke?token="+accessToken,{method:"POST"});
+  accessToken=null;folderId=null;fileId=null;entries=[];
+  sessionStorage.removeItem("oauth_state");clearInterval(syncInterval);
+  document.getElementById("app-screen").style.display="none";
+  document.getElementById("login-screen").style.display="flex";
+  history.replaceState(null,"",window.location.pathname);
+}
+function parseTokenFromHash(){
+  const hash=window.location.hash.substring(1);if(!hash) return null;
+  const p=new URLSearchParams(hash);const token=p.get("access_token"),state=p.get("state");
+  if(token&&state&&state===sessionStorage.getItem("oauth_state")){
+    history.replaceState(null,"",window.location.pathname);sessionStorage.removeItem("oauth_state");return token;
+  }return null;
+}
+window.addEventListener("load",async()=>{const token=parseTokenFromHash();if(token){accessToken=token;await afterLogin();}});
+async function afterLogin(){
+  try{
+    const r=await fetch("https://www.googleapis.com/oauth2/v3/userinfo",{headers:{Authorization:"Bearer "+accessToken}});
+    const d=await r.json();const email=(d.email||"").toLowerCase();
+    userName=AUTHOR_MAP[email]||d.given_name||email;
+  }catch{userName="Ukjent";}
+  document.getElementById("user-name-display").textContent="✍️ "+userName;
+  document.getElementById("login-screen").style.display="none";
+  document.getElementById("app-screen").style.display="block";
+  getLocation();await loadDriveData();
+  syncInterval=setInterval(()=>loadDriveData(true),30000);
+}
 
-  function handleSignOut() {
-    if (accessToken) {
-      fetch("https://oauth2.googleapis.com/revoke?token=" + accessToken, { method: "POST" });
-    }
-    accessToken = null; folderId = null; fileId = null; entries = [];
-    sessionStorage.removeItem("oauth_state");
-    clearInterval(syncInterval);
-    document.getElementById("app-screen").style.display = "none";
-    document.getElementById("login-screen").style.display = "flex";
-    // Clear hash
-    history.replaceState(null, "", window.location.pathname);
-  }
+function getLocation(){
+  if(!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const {latitude:lat,longitude:lon}=pos.coords;
+    fetch("https://nominatim.openstreetmap.org/reverse?lat="+lat+"&lon="+lon+"&format=json")
+      .then(r=>r.json()).then(d=>{
+        const a=d.address||{};
+        currentLocation=a.city||a.town||a.village||a.municipality||a.county||"";
+        if(currentLocation) document.getElementById("location-info").textContent="📍 "+currentLocation;
+      }).catch(()=>{});
+  },()=>{});
+}
 
-  // Parse token from URL hash after redirect
-  function parseTokenFromHash() {
-    const hash = window.location.hash.substring(1);
-    if (!hash) return null;
-    const params = new URLSearchParams(hash);
-    const token = params.get("access_token");
-    const state = params.get("state");
-    const savedState = sessionStorage.getItem("oauth_state");
-    if (token && state && state === savedState) {
-      // Clean up URL
-      history.replaceState(null, "", window.location.pathname);
-      sessionStorage.removeItem("oauth_state");
-      return token;
-    }
-    return null;
-  }
+function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(()=>t.style.display="none",3000)}
+function setSyncing(a,l){document.getElementById("sync-dot").className="sync-dot"+(a?" syncing":"");if(l)document.getElementById("sync-label").textContent=l}
+function formatDate(iso){return new Date(iso).toLocaleDateString("nb-NO",{weekday:"long",year:"numeric",month:"long",day:"numeric",hour:"2-digit",minute:"2-digit"})}
+function toDatetimeLocal(iso){const d=new Date(iso);const pad=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+"T"+pad(d.getHours())+":"+pad(d.getMinutes())}
+function resizeImage(dataUrl,maxPx=1200){return new Promise(res=>{const img=new Image();img.onload=()=>{const scale=Math.min(1,maxPx/Math.max(img.width,img.height));const canvas=document.createElement("canvas");canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);res(canvas.toDataURL("image/jpeg",.78))};img.src=dataUrl})}
 
-  // ---- INIT ----
-  window.addEventListener("load", async () => {
-    const token = parseTokenFromHash();
-    if (token) {
-      accessToken = token;
-      await afterLogin();
-    }
+function selectTag(tag){selectedTag=tag;["Felles","Liv","Lara"].forEach(t=>document.getElementById("tag-"+t).classList.toggle("active",t===tag))}
+function setFilterTag(tag){filterTag=tag;["Alle","Felles","Liv","Lara"].forEach(t=>document.getElementById("ftag-"+t).classList.toggle("active",t===tag));renderEntries()}
+function clearFilters(){setFilterTag("Alle");document.getElementById("filter-from").value="";document.getElementById("filter-to").value="";renderEntries()}
+function getFilteredEntries(){
+  const from=document.getElementById("filter-from").value,to=document.getElementById("filter-to").value;
+  return entries.filter(e=>{
+    if(filterTag!=="Alle"&&e.tag!==filterTag) return false;
+    if(from&&e.date<from) return false;
+    if(to&&e.date>to+"T23:59:59") return false;
+    return true;
   });
+}
+selectTag("Felles");
 
-  async function afterLogin() {
-    try {
-      const r = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-        headers: { Authorization: "Bearer " + accessToken }
-      });
-      const d = await r.json();
-      const email = (d.email || "").toLowerCase();
-      userName = AUTHOR_MAP[email] || d.given_name || email;
-    } catch { userName = "Ukjent"; }
+function switchView(v){
+  currentView=v;
+  document.getElementById("list-view").style.display=v==="list"?"block":"none";
+  document.getElementById("calendar-view").style.display=v==="calendar"?"block":"none";
+  document.getElementById("tab-list").classList.toggle("active",v==="list");
+  document.getElementById("tab-calendar").classList.toggle("active",v==="calendar");
+  if(v==="calendar") renderCalendar();
+}
 
-    document.getElementById("user-name-display").textContent = "✍️ " + userName;
-    document.getElementById("login-screen").style.display = "none";
-    document.getElementById("app-screen").style.display = "block";
-    await loadDriveData();
-    syncInterval = setInterval(() => loadDriveData(true), 30000);
+async function driveReq(method,path,params,body){
+  const q=params?"?"+new URLSearchParams(params):"";
+  const res=await fetch("https://www.googleapis.com/drive/v3"+path+q,{method,headers:{Authorization:"Bearer "+accessToken,"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});
+  if(!res.ok) throw new Error(await res.text());return res.json();
+}
+async function getOrCreateFolder(){
+  const res=await driveReq("GET","/files",{q:"name='"+FOLDER_NAME+"' and mimeType='application/vnd.google-apps.folder' and trashed=false",fields:"files(id)"});
+  if(res.files?.length) return res.files[0].id;
+  const f=await driveReq("POST","/files",null,{name:FOLDER_NAME,mimeType:"application/vnd.google-apps.folder"});return f.id;
+}
+async function getEntriesFileId(fid){
+  const res=await driveReq("GET","/files",{q:"name='"+ENTRIES_FILE+"' and '"+fid+"' in parents and trashed=false",fields:"files(id)"});
+  return res.files?.[0]?.id||null;
+}
+async function readEntries(eid){
+  const res=await fetch("https://www.googleapis.com/drive/v3/files/"+eid+"?alt=media",{headers:{Authorization:"Bearer "+accessToken}});
+  if(!res.ok) throw new Error("Kunne ikke lese fil");return res.json();
+}
+async function writeEntries(data){
+  const blob=new Blob([JSON.stringify(data)],{type:"application/json"});const form=new FormData();
+  if(fileId){
+    form.append("metadata",new Blob([JSON.stringify({})],{type:"application/json"}));form.append("file",blob);
+    await fetch("https://www.googleapis.com/upload/drive/v3/files/"+fileId+"?uploadType=multipart",{method:"PATCH",headers:{Authorization:"Bearer "+accessToken},body:form});
+  }else{
+    form.append("metadata",new Blob([JSON.stringify({name:ENTRIES_FILE,parents:[folderId]})],{type:"application/json"}));form.append("file",blob);
+    const res=await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",{method:"POST",headers:{Authorization:"Bearer "+accessToken},body:form});
+    const d=await res.json();fileId=d.id;
+    await driveReq("POST","/files/"+fileId+"/permissions",null,{role:"writer",type:"anyone"});
   }
+}
+async function loadDriveData(silent=false){
+  if(!silent) setSyncing(true,"Laster...");
+  try{
+    folderId=folderId||await getOrCreateFolder();fileId=fileId||await getEntriesFileId(folderId);
+    if(fileId){const data=await readEntries(fileId);entries=Array.isArray(data)?data:[];}else entries=[];
+    renderEntries();if(currentView==="calendar") renderCalendar();
+    const t=new Date().toLocaleTimeString("nb-NO",{hour:"2-digit",minute:"2-digit"});
+    setSyncing(false,"Sist synkronisert "+t);
+  }catch(e){setSyncing(false,"Synkronisering feilet");if(!silent){const el=document.getElementById("app-error");el.textContent="⚠️ "+e.message;el.style.display="block";}}
+}
 
-  // ---- UTILS ----
-  function showToast(msg) {
-    const t = document.getElementById("toast");
-    t.textContent = msg; t.style.display = "block";
-    setTimeout(() => t.style.display = "none", 3000);
-  }
-  function setSyncing(active, label) {
-    document.getElementById("sync-dot").className = "sync-dot" + (active ? " syncing" : "");
-    if (label) document.getElementById("sync-label").textContent = label;
-  }
-  function formatDate(iso) {
-    return new Date(iso).toLocaleDateString("nb-NO", {
-      weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit"
-    });
-  }
-  function resizeImage(dataUrl, maxPx = 1200) {
-    return new Promise(res => {
-      const img = new Image();
-      img.onload = () => {
-        const scale = Math.min(1, maxPx / Math.max(img.width, img.height));
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.round(img.width * scale);
-        canvas.height = Math.round(img.height * scale);
-        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-        res(canvas.toDataURL("image/jpeg", 0.78));
-      };
-      img.src = dataUrl;
-    });
-  }
+async function handlePhotos(input){
+  const files=Array.from(input.files);
+  const dataUrls=await Promise.all(files.map(f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(f)})));
+  const resized=await Promise.all(dataUrls.map(d=>resizeImage(d)));
+  pendingPhotos=[...pendingPhotos,...resized].slice(0,6);input.value="";renderPhotoPreviews();
+}
+function renderPhotoPreviews(){
+  const el=document.getElementById("photo-previews"),cnt=document.getElementById("photo-count");
+  cnt.textContent=pendingPhotos.length;cnt.style.display=pendingPhotos.length?"inline":"none";
+  el.innerHTML=pendingPhotos.map((src,i)=>'<div class="photo-thumb-wrap"><img src="'+src+'" class="photo-thumb"/><button class="photo-remove" onclick="removePhoto('+i+')">×</button></div>').join("");
+}
+function removePhoto(i){pendingPhotos.splice(i,1);renderPhotoPreviews()}
 
-  // ---- TAGS ----
-  function selectTag(tag) {
-    selectedTag = tag;
-    ["Felles","Liv","Lara"].forEach(t =>
-      document.getElementById("tag-" + t).classList.toggle("active", t === tag)
-    );
-  }
-  selectTag("Felles");
+async function handleSubmit(){
+  const ta=document.getElementById("entry-textarea"),text=ta.value.trim();if(!text) return;
+  const btn=document.getElementById("submit-btn");btn.disabled=true;btn.textContent="Lagrer...";
+  const newEntry={id:Date.now().toString(),author:userName,tag:selectedTag,text,photos:[...pendingPhotos],date:new Date().toISOString(),location:currentLocation||null,editHistory:[]};
+  const updated=[newEntry,...entries];
+  try{
+    await writeEntries(updated);entries=updated;ta.value="";pendingPhotos=[];
+    renderPhotoPreviews();renderEntries();if(currentView==="calendar") renderCalendar();showToast("Innlegg lagret! 📖");
+  }catch(e){showToast("Feil: "+e.message);}
+  btn.disabled=false;btn.textContent="Skriv inn ✦";
+}
 
-  function setFilterTag(tag) {
-    filterTag = tag;
-    ["Alle","Felles","Liv","Lara"].forEach(t =>
-      document.getElementById("ftag-" + t).classList.toggle("active", t === tag)
-    );
-    renderEntries();
-  }
-  function clearFilters() {
-    setFilterTag("Alle");
-    document.getElementById("filter-from").value = "";
-    document.getElementById("filter-to").value = "";
-    renderEntries();
-  }
-  function getFilteredEntries() {
-    const from = document.getElementById("filter-from").value;
-    const to = document.getElementById("filter-to").value;
-    return entries.filter(e => {
-      if (filterTag !== "Alle" && e.tag !== filterTag) return false;
-      if (from && e.date < from) return false;
-      if (to && e.date > to + "T23:59:59") return false;
-      return true;
-    });
-  }
+async function deleteEntry(id){
+  if(!confirm("Slette dette innlegget?")) return;
+  const updated=entries.filter(e=>e.id!==id);
+  try{await writeEntries(updated);entries=updated;renderEntries();if(currentView==="calendar")renderCalendar();showToast("Slettet.");}
+  catch{showToast("Feil ved sletting.");}
+}
 
-  // ---- DRIVE ----
-  async function driveReq(method, path, params, body) {
-    const q = params ? "?" + new URLSearchParams(params) : "";
-    const res = await fetch("https://www.googleapis.com/drive/v3" + path + q, {
-      method,
-      headers: { Authorization: "Bearer " + accessToken, "Content-Type": "application/json" },
-      body: body ? JSON.stringify(body) : undefined
-    });
-    if (!res.ok) throw new Error(await res.text());
-    return res.json();
-  }
-  async function getOrCreateFolder() {
-    const res = await driveReq("GET", "/files", {
-      q: `name='${FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
-      fields: "files(id)"
-    });
-    if (res.files?.length) return res.files[0].id;
-    const f = await driveReq("POST", "/files", null, { name: FOLDER_NAME, mimeType: "application/vnd.google-apps.folder" });
-    return f.id;
-  }
-  async function getEntriesFileId(fid) {
-    const res = await driveReq("GET", "/files", {
-      q: `name='${ENTRIES_FILE}' and '${fid}' in parents and trashed=false`,
-      fields: "files(id)"
-    });
-    return res.files?.[0]?.id || null;
-  }
-  async function readEntries(eid) {
-    const res = await fetch(`https://www.googleapis.com/drive/v3/files/${eid}?alt=media`, {
-      headers: { Authorization: "Bearer " + accessToken }
-    });
-    if (!res.ok) throw new Error("Kunne ikke lese fil");
-    return res.json();
-  }
-  async function writeEntries(data) {
-    const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
-    const form = new FormData();
-    if (fileId) {
-      form.append("metadata", new Blob([JSON.stringify({})], { type: "application/json" }));
-      form.append("file", blob);
-      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart`, {
-        method: "PATCH", headers: { Authorization: "Bearer " + accessToken }, body: form
-      });
-    } else {
-      form.append("metadata", new Blob([JSON.stringify({ name: ENTRIES_FILE, parents: [folderId] })], { type: "application/json" }));
-      form.append("file", blob);
-      const res = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {
-        method: "POST", headers: { Authorization: "Bearer " + accessToken }, body: form
-      });
-      const d = await res.json();
-      fileId = d.id;
-      await driveReq("POST", `/files/${fileId}/permissions`, null, { role: "writer", type: "anyone" });
-    }
-  }
-  async function loadDriveData(silent = false) {
-    if (!silent) setSyncing(true, "Laster...");
-    try {
-      folderId = folderId || await getOrCreateFolder();
-      fileId = fileId || await getEntriesFileId(folderId);
-      if (fileId) {
-        const data = await readEntries(fileId);
-        entries = Array.isArray(data) ? data : [];
-      } else { entries = []; }
-      renderEntries();
-      const t = new Date().toLocaleTimeString("nb-NO", { hour: "2-digit", minute: "2-digit" });
-      setSyncing(false, `Sist synkronisert ${t}`);
-    } catch (e) {
-      setSyncing(false, "Synkronisering feilet");
-      if (!silent) {
-        const el = document.getElementById("app-error");
-        el.textContent = "⚠️ Kunne ikke laste dagboken: " + e.message;
-        el.style.display = "block";
-      }
-    }
-  }
+function openEditModal(id){
+  const entry=entries.find(e=>e.id===id);if(!entry) return;
+  editingId=id;modalPhotos=[...(entry.photos||[])];modalTag=entry.tag||"Felles";
+  document.getElementById("modal-text").value=entry.text;
+  document.getElementById("modal-date").value=toDatetimeLocal(entry.date);
+  selectModalTag(modalTag);renderModalPhotos();
+  document.getElementById("edit-modal").classList.add("active");
+}
+function closeEditModal(){document.getElementById("edit-modal").classList.remove("active");editingId=null;}
+function selectModalTag(tag){modalTag=tag;["Felles","Liv","Lara"].forEach(t=>document.getElementById("modal-tag-"+t).classList.toggle("active",t===tag))}
+async function handleModalPhotos(input){
+  const files=Array.from(input.files);
+  const dataUrls=await Promise.all(files.map(f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(f)})));
+  const resized=await Promise.all(dataUrls.map(d=>resizeImage(d)));
+  modalPhotos=[...modalPhotos,...resized].slice(0,6);input.value="";renderModalPhotos();
+}
+function removeModalPhoto(i){modalPhotos.splice(i,1);renderModalPhotos()}
+function renderModalPhotos(){
+  document.getElementById("modal-photos-preview").innerHTML=modalPhotos.map((src,i)=>'<div class="modal-photo-wrap"><img src="'+src+'" class="modal-photo-thumb"/><button class="modal-photo-remove" onclick="removeModalPhoto('+i+')">×</button></div>').join("");
+}
+async function saveEdit(){
+  if(!editingId) return;const idx=entries.findIndex(e=>e.id===editingId);if(idx===-1) return;
+  const old=entries[idx];
+  const newText=document.getElementById("modal-text").value.trim();
+  const newDate=new Date(document.getElementById("modal-date").value).toISOString();
+  const editRecord={by:userName,at:new Date().toISOString()};
+  const updated={...old,text:newText,tag:modalTag,date:newDate,photos:modalPhotos,editHistory:[...(old.editHistory||[]),editRecord]};
+  const updatedEntries=[...entries];updatedEntries[idx]=updated;
+  try{
+    await writeEntries(updatedEntries);entries=updatedEntries;
+    closeEditModal();renderEntries();if(currentView==="calendar")renderCalendar();showToast("Endringer lagret! ✏️");
+  }catch(e){showToast("Feil: "+e.message);}
+}
 
-  // ---- PHOTOS ----
-  async function handlePhotos(input) {
-    const files = Array.from(input.files);
-    const dataUrls = await Promise.all(files.map(f => new Promise((res, rej) => {
-      const r = new FileReader(); r.onload = e => res(e.target.result); r.onerror = rej; r.readAsDataURL(f);
-    })));
-    const resized = await Promise.all(dataUrls.map(d => resizeImage(d)));
-    pendingPhotos = [...pendingPhotos, ...resized].slice(0, 6);
-    input.value = ""; renderPhotoPreviews();
-  }
-  function renderPhotoPreviews() {
-    const el = document.getElementById("photo-previews");
-    const cnt = document.getElementById("photo-count");
-    cnt.textContent = pendingPhotos.length;
-    cnt.style.display = pendingPhotos.length ? "inline" : "none";
-    el.innerHTML = pendingPhotos.map((src, i) => `
-      <div class="photo-thumb-wrap">
-        <img src="${src}" class="photo-thumb" />
-        <button class="photo-remove" onclick="removePhoto(${i})">×</button>
-      </div>`).join("");
-  }
-  function removePhoto(i) { pendingPhotos.splice(i, 1); renderPhotoPreviews(); }
+function tagEmoji(tag){return tag==="Liv"?"🌸":tag==="Lara"?"⭐":"🌿"}
+function entryCardHTML(e,showActions=true){
+  return '<div class="entry-card">'+
+    '<div class="entry-body">'+
+    '<div class="entry-meta">'+
+    '<span class="entry-author-badge">✍️ Skrevet av '+e.author+'</span>'+
+    (e.tag?'<span class="entry-tag '+e.tag+'">'+tagEmoji(e.tag)+' '+e.tag+'</span>':'')+
+    '<span class="entry-date">'+formatDate(e.date)+'</span>'+
+    (e.location?'<span class="entry-location">📍 '+e.location+'</span>':'')+
+    '</div>'+
+    '<div class="entry-text">'+e.text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")+'</div>'+
+    (e.editHistory?.length?'<div class="entry-edit-history">Redigert av '+e.editHistory[e.editHistory.length-1].by+' — '+formatDate(e.editHistory[e.editHistory.length-1].at)+'</div>':'')+
+    '</div>'+
+    (e.photos?.length?'<div class="entry-photos">'+e.photos.map(src=>'<img src="'+src+'" class="entry-photo" onclick="openLightbox(\''+src+'\')"/>').join('')+'</div>':'')+
+    (showActions?'<div class="entry-actions-bar"><button class="edit-btn" onclick="openEditModal(\''+e.id+'\')">✏️ Rediger</button><button class="delete-btn" onclick="deleteEntry(\''+e.id+'\')">Slett</button></div>':'')+
+    '</div>';
+}
 
-  // ---- SUBMIT ----
-  async function handleSubmit() {
-    const ta = document.getElementById("entry-textarea");
-    const text = ta.value.trim();
-    if (!text) return;
-    const btn = document.getElementById("submit-btn");
-    btn.disabled = true; btn.textContent = "Lagrer...";
-    const newEntry = { id: Date.now().toString(), author: userName, tag: selectedTag, text, photos: [...pendingPhotos], date: new Date().toISOString() };
-    const updated = [newEntry, ...entries];
-    try {
-      await writeEntries(updated);
-      entries = updated; ta.value = ""; pendingPhotos = [];
-      renderPhotoPreviews(); renderEntries();
-      showToast("Innlegg lagret på Drive! 📖");
-    } catch (e) { showToast("Feil ved lagring: " + e.message); }
-    btn.disabled = false; btn.textContent = "Skriv inn ✦";
-  }
+function renderEntries(){
+  const filtered=getFilteredEntries();
+  document.getElementById("entries-count").textContent=filtered.length<entries.length?"Viser "+filtered.length+" av "+entries.length+" innlegg":entries.length+" innlegg totalt";
+  const el=document.getElementById("entries-list");
+  if(filtered.length===0){el.innerHTML='<div class="empty-state"><span class="empty-icon">📖</span>'+(entries.length===0?"Ingen innlegg ennå. Skriv det første!":"Ingen innlegg matcher filteret.")+'</div>';return;}
+  el.innerHTML=filtered.map(e=>entryCardHTML(e)).join("");
+}
 
-  // ---- DELETE ----
-  async function deleteEntry(id) {
-    if (!confirm("Slette dette innlegget?")) return;
-    const updated = entries.filter(e => e.id !== id);
-    try {
-      await writeEntries(updated); entries = updated; renderEntries();
-      showToast("Innlegg slettet.");
-    } catch { showToast("Feil ved sletting."); }
-  }
+function renderCalendar(){
+  const monthNames=["Januar","Februar","Mars","April","Mai","Juni","Juli","August","September","Oktober","November","Desember"];
+  document.getElementById("cal-title").textContent=monthNames[calMonth]+" "+calYear;
+  const grid=document.getElementById("cal-grid");
+  const dayNames=["Man","Tir","Ons","Tor","Fre","Lør","Søn"];
+  let html=dayNames.map(d=>'<div class="cal-day-name">'+d+'</div>').join("");
+  const firstDay=new Date(calYear,calMonth,1);
+  let startDow=firstDay.getDay()-1;if(startDow<0)startDow=6;
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  const daysInPrev=new Date(calYear,calMonth,0).getDate();
+  const today=new Date();
+  const entryMap={};
+  entries.forEach(e=>{const d=new Date(e.date);const key=d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate();if(!entryMap[key])entryMap[key]=[];entryMap[key].push(e);});
+  let cells=[];
+  for(let i=0;i<startDow;i++) cells.push({day:daysInPrev-startDow+1+i,curr:false});
+  for(let i=1;i<=daysInMonth;i++) cells.push({day:i,curr:true});
+  while(cells.length%7!==0) cells.push({day:cells.length-startDow-daysInMonth+1,curr:false});
+  cells.forEach(c=>{
+    const isToday=c.curr&&c.day===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear();
+    const isSelected=calSelectedDate&&c.curr&&c.day===calSelectedDate;
+    const key=calYear+"-"+calMonth+"-"+c.day;
+    const dayEntries=c.curr?(entryMap[key]||[]):[];
+    const hasEntries=dayEntries.length>0;
+    const dots=dayEntries.map(e=>'<div class="cal-dot '+(e.tag||'unknown')+'"></div>').join("");
+    html+='<div class="cal-day'+((!c.curr)?" other-month":"")+(isToday?" today":"")+(isSelected?" selected":"")+(hasEntries?" has-entries":"")+'" '+(c.curr?"onclick=\"selectCalDay("+c.day+")\"":"")+'>'+
+      '<div class="cal-day-num">'+c.day+'</div>'+
+      '<div class="cal-dots">'+dots+'</div></div>';
+  });
+  grid.innerHTML=html;
+  if(calSelectedDate) renderCalSelected();
+}
+function selectCalDay(day){calSelectedDate=day;renderCalendar();}
+function renderCalSelected(){
+  const el=document.getElementById("cal-selected-entries");
+  const dayEntries=entries.filter(e=>{const d=new Date(e.date);return d.getFullYear()===calYear&&d.getMonth()===calMonth&&d.getDate()===calSelectedDate});
+  const monthNames=["januar","februar","mars","april","mai","juni","juli","august","september","oktober","november","desember"];
+  if(dayEntries.length===0){el.innerHTML='<div class="cal-selected-title">'+calSelectedDate+'. '+monthNames[calMonth]+' '+calYear+' — Ingen innlegg denne dagen.</div>';return;}
+  el.innerHTML='<div class="cal-selected-title">'+calSelectedDate+'. '+monthNames[calMonth]+' '+calYear+'</div>'+dayEntries.map(e=>entryCardHTML(e)).join("");
+}
+function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}calSelectedDate=null;renderCalendar();}
+function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}calSelectedDate=null;renderCalendar();}
 
-  // ---- RENDER ----
-  function tagEmoji(tag) {
-    if (tag === "Liv") return "🌸";
-    if (tag === "Lara") return "⭐";
-    return "🌿";
-  }
-  function renderEntries() {
-    const filtered = getFilteredEntries();
-    document.getElementById("entries-count").textContent = filtered.length < entries.length
-      ? `Viser ${filtered.length} av ${entries.length} innlegg`
-      : `${entries.length} innlegg totalt`;
-    const el = document.getElementById("entries-list");
-    if (filtered.length === 0) {
-      el.innerHTML = `<div class="empty-state"><span class="empty-icon">📖</span>${entries.length === 0 ? "Ingen innlegg ennå. Skriv det første!" : "Ingen innlegg matcher filteret."}</div>`;
-      return;
-    }
-    el.innerHTML = filtered.map(e => `
-      <div class="entry-card">
-        <button class="entry-delete" onclick="deleteEntry('${e.id}')">✕</button>
-        <div class="entry-body">
-          <div class="entry-meta">
-            <span class="entry-author-badge">✍️ Skrevet av ${e.author}</span>
-            ${e.tag ? `<span class="entry-tag ${e.tag}">${tagEmoji(e.tag)} ${e.tag}</span>` : ""}
-            <span class="entry-date">${formatDate(e.date)}</span>
-          </div>
-          <div class="entry-text">${e.text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
-        </div>
-        ${e.photos?.length ? `<div class="entry-photos">${e.photos.map(src=>`<img src="${src}" class="entry-photo" onclick="openLightbox('${src}')" />`).join("")}</div>` : ""}
-      </div>`).join("");
-  }
-
-  // ---- LIGHTBOX ----
-  function openLightbox(src) { document.getElementById("lightbox-img").src = src; document.getElementById("lightbox").classList.add("active"); }
-  function closeLightbox() { document.getElementById("lightbox").classList.remove("active"); document.getElementById("lightbox-img").src = ""; }
+function openLightbox(src){document.getElementById("lightbox-img").src=src;document.getElementById("lightbox").classList.add("active")}
+function closeLightbox(){document.getElementById("lightbox").classList.remove("active");document.getElementById("lightbox-img").src=""}
 </script>
 </body>
 </html>
