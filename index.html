@@ -1,148 +1,208 @@
 <!DOCTYPE html>
 <html lang="nb">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Familiedagbok</title>
-  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Caveat:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Caveat:wght@400;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{min-height:100vh;background:#f5ede0;background-image:radial-gradient(ellipse at 20% 10%,rgba(210,170,120,.18) 0%,transparent 60%),radial-gradient(ellipse at 80% 90%,rgba(180,130,90,.13) 0%,transparent 60%);font-family:'Lora',serif}
+    /* LOGIN */
     #login-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center}
     .login-book{font-size:4rem;margin-bottom:24px;animation:float 3s ease-in-out infinite}
     @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
     .login-title{font-family:'Caveat',cursive;font-size:3.2rem;color:#5c3d1e;margin-bottom:6px}
     .login-subtitle{font-style:italic;color:#a07850;font-size:.9rem;margin-bottom:44px}
     .login-btn{display:flex;align-items:center;gap:12px;padding:14px 28px;background:#fffdf7;border:1.5px solid #c8915a;border-radius:30px;font-family:'Lora',serif;font-size:1rem;color:#5c3d1e;cursor:pointer;box-shadow:0 4px 16px rgba(100,60,20,.12);transition:all .2s}
-    .login-btn:hover{transform:translateY(-2px)}
+    .login-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(100,60,20,.18)}
     .login-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
     .login-note{margin-top:18px;font-size:.78rem;color:#b09070;font-style:italic;max-width:280px}
     .error-box{background:#fff5f0;border:1px solid #e8b89a;border-radius:8px;padding:14px 18px;margin:0 0 20px;font-size:.85rem;color:#7a4020;max-width:500px}
+    /* APP */
     #app-screen{display:none}
-    .header{text-align:center;padding:32px 20px 16px}
-    .header-title{font-family:'Caveat',cursive;font-size:2.8rem;color:#5c3d1e;line-height:1}
-    .header-subtitle{font-style:italic;color:#a07850;font-size:.85rem;margin-top:5px}
-    .header-divider{width:120px;height:2px;background:linear-gradient(90deg,transparent,#c8915a,transparent);margin:12px auto 0}
-    .user-bar{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 20px 0;font-size:.82rem;color:#a07850;flex-wrap:wrap}
+    .header{text-align:center;padding:26px 20px 10px}
+    .header-title{font-family:'Caveat',cursive;font-size:2.6rem;color:#5c3d1e;line-height:1}
+    .header-subtitle{font-style:italic;color:#a07850;font-size:.82rem;margin-top:4px}
+    .header-divider{width:100px;height:2px;background:linear-gradient(90deg,transparent,#c8915a,transparent);margin:10px auto 0}
+    .user-bar{display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 20px 0;font-size:.82rem;color:#a07850;flex-wrap:wrap}
     .user-name{font-family:'Caveat',cursive;font-size:1.05rem;color:#7a5230;background:rgba(200,145,90,.15);padding:3px 12px;border-radius:12px;border:1px solid rgba(200,145,90,.3)}
     .signout-btn{background:transparent;border:1px solid #c8a882;border-radius:12px;padding:3px 10px;font-family:'Lora',serif;font-size:.75rem;color:#a07850;cursor:pointer}
     .signout-btn:hover{background:rgba(200,145,90,.1)}
-    .sync-bar{text-align:center;font-size:.75rem;color:#b09070;font-style:italic;padding:6px 0 0}
-    .sync-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#a8c890;margin-right:5px;vertical-align:middle}
+    .sync-bar{text-align:center;font-size:.72rem;color:#b09070;font-style:italic;padding:4px 0 0}
+    .sync-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#a8c890;margin-right:4px;vertical-align:middle}
     .sync-dot.syncing{background:#c8b870;animation:pulse 1s infinite}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-    .view-tabs{display:flex;justify-content:center;gap:8px;padding:16px 20px 0;max-width:640px;margin:0 auto}
-    .view-tab{padding:7px 20px;border-radius:20px;border:1.5px solid #c8a87a;background:transparent;font-family:'Lora',serif;font-size:.85rem;color:#7a5230;cursor:pointer;transition:all .15s}
-    .view-tab.active{background:#7a5230;color:#f5ede0;border-color:#7a5230}
-    .view-tab:hover:not(.active){background:rgba(200,145,90,.12)}
-    .new-entry-wrapper{max-width:640px;margin:22px auto 0;padding:0 16px}
-    .new-entry-card{background:#fffdf7;border-radius:4px;box-shadow:0 2px 12px rgba(100,60,20,.1),0 0 0 1px rgba(180,130,80,.12);padding:22px 26px 18px;position:relative;overflow:hidden}
-    .new-entry-card::before{content:'';position:absolute;left:50px;top:0;bottom:0;width:1px;background:rgba(220,100,80,.22);z-index:0}
+    /* TABS */
+    .tab-bar{display:flex;justify-content:center;gap:5px;padding:12px 12px 0;max-width:680px;margin:0 auto;flex-wrap:wrap}
+    .tab-btn{flex:1;min-width:80px;padding:7px 4px;border:1.5px solid #c8a87a;border-radius:18px;background:transparent;font-family:'Lora',serif;font-size:.75rem;color:#7a5230;cursor:pointer;transition:all .15s;text-align:center}
+    .tab-btn.active{background:#7a5230;color:#f5ede0;border-color:#7a5230}
+    .tab-btn:hover:not(.active){background:rgba(200,145,90,.1)}
+    .view{display:none}.view.active{display:block}
+    /* WRITE */
+    .new-entry-wrapper{max-width:640px;margin:16px auto 0;padding:0 16px}
+    .new-entry-card{background:#fffdf7;border-radius:4px;box-shadow:0 2px 12px rgba(100,60,20,.1),0 0 0 1px rgba(180,130,80,.12);padding:20px 24px 16px;position:relative;overflow:hidden}
+    .new-entry-card::before{content:'';position:absolute;left:48px;top:0;bottom:0;width:1px;background:rgba(220,100,80,.22);z-index:0}
     .new-entry-card::after{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(transparent,transparent 27px,rgba(180,150,110,.13) 27px,rgba(180,150,110,.13) 28px);pointer-events:none;z-index:0}
-    .new-entry-label{font-family:'Caveat',cursive;font-size:1.15rem;color:#a07040;margin-bottom:10px;padding-left:44px;position:relative;z-index:1}
-    #entry-textarea{width:100%;min-height:120px;background:transparent;border:none;outline:none;resize:none;font-family:'Lora',serif;font-size:.95rem;color:#3d2b14;line-height:28px;padding-left:44px;position:relative;z-index:1}
+    .new-entry-label{font-family:'Caveat',cursive;font-size:1.1rem;color:#a07040;margin-bottom:8px;padding-left:42px;position:relative;z-index:1}
+    #entry-textarea{width:100%;min-height:110px;background:transparent;border:none;outline:none;resize:none;font-family:'Lora',serif;font-size:.93rem;color:#3d2b14;line-height:28px;padding-left:42px;position:relative;z-index:1}
     #entry-textarea::placeholder{color:#c4a882}
-    .tag-selector{display:flex;gap:8px;padding-left:44px;margin-top:12px;position:relative;z-index:1;flex-wrap:wrap;align-items:center}
-    .tag-selector-label{font-size:.78rem;color:#a07850;font-style:italic}
-    .tag-btn{padding:4px 14px;border-radius:16px;border:1.5px solid #c8a87a;background:transparent;font-family:'Lora',serif;font-size:.8rem;color:#7a5230;cursor:pointer;transition:all .15s}
+    .entry-meta-row{display:flex;gap:8px;padding-left:42px;margin-top:10px;position:relative;z-index:1;flex-wrap:wrap;align-items:center}
+    .meta-label{font-size:.75rem;color:#a07850;font-style:italic}
+    .tag-btn{padding:3px 12px;border-radius:14px;border:1.5px solid #c8a87a;background:transparent;font-family:'Lora',serif;font-size:.78rem;color:#7a5230;cursor:pointer;transition:all .15s}
     .tag-btn.active{background:#c8915a;color:white;border-color:#c8915a}
     .tag-btn:hover:not(.active){background:rgba(200,145,90,.12)}
-    .entry-actions{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-left:44px;position:relative;z-index:1;flex-wrap:wrap;gap:8px}
-    .photo-label{display:flex;align-items:center;gap:6px;font-size:.8rem;color:#a07850;cursor:pointer;padding:6px 12px;border-radius:16px;border:1px dashed #c8a87a;transition:all .2s}
+    .location-display{font-size:.72rem;color:#b09070;font-style:italic;padding-left:42px;margin-top:6px;position:relative;z-index:1}
+    .entry-actions{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-left:42px;position:relative;z-index:1}
+    .photo-label{display:flex;align-items:center;gap:6px;font-size:.78rem;color:#a07850;cursor:pointer;padding:5px 10px;border-radius:14px;border:1px dashed #c8a87a;transition:all .2s}
     .photo-label:hover{background:rgba(200,168,122,.1)}
-    #photo-count{background:#c8915a;color:white;border-radius:10px;font-size:.68rem;padding:1px 6px;font-family:'Caveat',cursive;display:none}
-    .location-info{font-size:.75rem;color:#a07850;font-style:italic;padding-left:44px;margin-top:6px;position:relative;z-index:1}
-    .submit-btn{padding:8px 20px;background:#7a5230;color:#f5ede0;border:none;border-radius:20px;font-family:'Lora',serif;font-size:.85rem;cursor:pointer;transition:all .2s;box-shadow:0 2px 6px rgba(100,60,20,.2)}
+    #photo-count{background:#c8915a;color:white;border-radius:10px;font-size:.65rem;padding:1px 5px;font-family:'Caveat',cursive;display:none}
+    .submit-btn{padding:7px 18px;background:#7a5230;color:#f5ede0;border:none;border-radius:18px;font-family:'Lora',serif;font-size:.83rem;cursor:pointer;transition:all .2s;box-shadow:0 2px 6px rgba(100,60,20,.2)}
     .submit-btn:hover{background:#5c3d1e;transform:translateY(-1px)}
     .submit-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
-    #photo-previews{display:flex;flex-wrap:wrap;gap:8px;padding-left:44px;margin-top:10px;position:relative;z-index:1}
+    #photo-previews{display:flex;flex-wrap:wrap;gap:7px;padding-left:42px;margin-top:8px;position:relative;z-index:1}
     .photo-thumb-wrap{position:relative}
-    .photo-thumb{width:60px;height:60px;object-fit:cover;border-radius:4px;border:2px solid #e8d5b8}
-    .photo-remove{position:absolute;top:-6px;right:-6px;width:18px;height:18px;background:#7a5230;color:white;border-radius:50%;border:none;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-    .filter-bar{max-width:640px;margin:22px auto 0;padding:0 16px}
-    .filter-card{background:#fffdf7;border-radius:4px;box-shadow:0 1px 8px rgba(100,60,20,.07),0 0 0 1px rgba(180,130,80,.1);padding:16px 20px}
-    .filter-title{font-family:'Caveat',cursive;font-size:1.05rem;color:#a07040;margin-bottom:12px}
-    .filter-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
-    .filter-row-label{font-size:.78rem;color:#a07850;font-style:italic;min-width:60px}
-    .filter-tag-btn{padding:3px 12px;border-radius:14px;border:1.5px solid #c8a87a;background:transparent;font-family:'Lora',serif;font-size:.78rem;color:#7a5230;cursor:pointer;transition:all .15s}
+    .photo-thumb{width:56px;height:56px;object-fit:cover;border-radius:4px;border:2px solid #e8d5b8}
+    .photo-remove{position:absolute;top:-5px;right:-5px;width:16px;height:16px;background:#7a5230;color:white;border-radius:50%;border:none;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    /* FILTER */
+    .filter-bar{max-width:640px;margin:14px auto 0;padding:0 16px}
+    .filter-card{background:#fffdf7;border-radius:4px;box-shadow:0 1px 8px rgba(100,60,20,.07),0 0 0 1px rgba(180,130,80,.1);padding:14px 18px}
+    .filter-title{font-family:'Caveat',cursive;font-size:1rem;color:#a07040;margin-bottom:10px}
+    .filter-row{display:flex;align-items:center;gap:7px;margin-bottom:8px;flex-wrap:wrap}
+    .filter-row-label{font-size:.75rem;color:#a07850;font-style:italic;min-width:55px}
+    .filter-tag-btn{padding:3px 10px;border-radius:12px;border:1.5px solid #c8a87a;background:transparent;font-family:'Lora',serif;font-size:.75rem;color:#7a5230;cursor:pointer;transition:all .15s}
     .filter-tag-btn.active{background:#c8915a;color:white;border-color:#c8915a}
     .filter-tag-btn:hover:not(.active){background:rgba(200,145,90,.12)}
-    .date-inputs{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .date-input{padding:4px 8px;border:1px solid #c8a87a;border-radius:8px;font-family:'Lora',serif;font-size:.78rem;color:#5c3d1e;background:#fffdf7}
-    .date-sep{color:#a07850;font-size:.78rem}
-    .filter-clear{padding:3px 12px;border-radius:14px;border:1px solid #c8a882;background:transparent;font-family:'Lora',serif;font-size:.75rem;color:#a07850;cursor:pointer;margin-left:auto}
+    .date-inputs{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+    .date-input{padding:3px 7px;border:1px solid #c8a87a;border-radius:7px;font-family:'Lora',serif;font-size:.75rem;color:#5c3d1e;background:#fffdf7}
+    .date-sep{color:#a07850;font-size:.75rem}
+    .filter-clear{padding:3px 10px;border-radius:12px;border:1px solid #c8a882;background:transparent;font-family:'Lora',serif;font-size:.72rem;color:#a07850;cursor:pointer;margin-left:auto}
     .filter-clear:hover{background:rgba(200,145,90,.1)}
-    .entries-section{max-width:640px;margin:20px auto 60px;padding:0 16px}
-    .entries-header{font-family:'Caveat',cursive;font-size:1.35rem;color:#a07040;text-align:center;margin-bottom:18px}
-    .entries-count{text-align:center;font-size:.78rem;color:#b09070;font-style:italic;margin-bottom:14px}
-    .entry-card{background:#fffdf7;border-radius:4px;box-shadow:0 2px 10px rgba(100,60,20,.08),0 0 0 1px rgba(180,130,80,.1);margin-bottom:18px;overflow:hidden;animation:fadeIn .4s ease;position:relative}
+    /* ENTRIES */
+    .entries-section{max-width:640px;margin:14px auto 60px;padding:0 16px}
+    .entries-header{font-family:'Caveat',cursive;font-size:1.3rem;color:#a07040;text-align:center;margin-bottom:14px}
+    .entries-count{text-align:center;font-size:.75rem;color:#b09070;font-style:italic;margin-bottom:12px}
+    .entry-card{background:#fffdf7;border-radius:4px;box-shadow:0 2px 10px rgba(100,60,20,.08),0 0 0 1px rgba(180,130,80,.1);margin-bottom:16px;overflow:hidden;animation:fadeIn .4s ease;position:relative}
     @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-    .entry-body{padding:16px 20px 16px 56px;position:relative}
-    .entry-body::before{content:'';position:absolute;left:44px;top:0;bottom:0;width:1px;background:rgba(220,100,80,.2)}
+    .entry-body{padding:14px 18px 14px 52px;position:relative}
+    .entry-body::before{content:'';position:absolute;left:40px;top:0;bottom:0;width:1px;background:rgba(220,100,80,.2)}
     .entry-body::after{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(transparent,transparent 27px,rgba(180,150,110,.1) 27px,rgba(180,150,110,.1) 28px);pointer-events:none}
-    .entry-meta{display:flex;align-items:center;gap:8px;margin-bottom:7px;position:relative;z-index:1;flex-wrap:wrap}
-    .entry-author-badge{font-family:'Caveat',cursive;font-size:.95rem;font-weight:600;color:#7a5230;background:rgba(200,145,90,.15);padding:2px 10px;border-radius:12px;border:1px solid rgba(200,145,90,.3)}
-    .entry-tag{font-family:'Caveat',cursive;font-size:.85rem;padding:1px 9px;border-radius:10px}
+    .entry-meta{display:flex;align-items:center;gap:7px;margin-bottom:6px;position:relative;z-index:1;flex-wrap:wrap}
+    .entry-author-badge{font-family:'Caveat',cursive;font-size:.92rem;font-weight:600;color:#7a5230;background:rgba(200,145,90,.15);padding:2px 9px;border-radius:11px;border:1px solid rgba(200,145,90,.3)}
+    .entry-tag{font-family:'Caveat',cursive;font-size:.82rem;padding:1px 8px;border-radius:9px}
     .entry-tag.Liv{background:#fde8f0;color:#b05070;border:1px solid #f0b8cc}
     .entry-tag.Lara{background:#e8f0fd;color:#4060b0;border:1px solid #b8ccf0}
     .entry-tag.Felles{background:#e8fde8;color:#407040;border:1px solid #b8e8b8}
-    .entry-date{font-size:.75rem;color:#b09070;font-style:italic}
-    .entry-location{font-size:.72rem;color:#b09070;font-style:italic}
-    .entry-text{font-size:.93rem;color:#3d2b14;line-height:28px;white-space:pre-wrap;position:relative;z-index:1}
-    .entry-edit-history{font-size:.72rem;color:#b09070;font-style:italic;margin-top:6px;position:relative;z-index:1;border-top:1px solid rgba(180,150,110,.2);padding-top:6px}
-    .entry-photos{display:flex;flex-wrap:wrap;gap:8px;padding:8px 20px 14px 56px}
-    .entry-photo{width:85px;height:85px;object-fit:cover;border-radius:4px;border:2px solid #e8d5b8;box-shadow:2px 3px 8px rgba(0,0,0,.12);cursor:pointer;transition:transform .15s}
+    .entry-date{font-size:.72rem;color:#b09070;font-style:italic}
+    .entry-location{font-size:.68rem;color:#b8a080;font-style:italic}
+    .entry-text{font-size:.91rem;color:#3d2b14;line-height:28px;white-space:pre-wrap;position:relative;z-index:1}
+    .entry-edit-history{font-size:.68rem;color:#b09070;font-style:italic;margin-top:6px;position:relative;z-index:1;border-top:1px dashed rgba(180,150,110,.3);padding-top:5px}
+    .entry-photos{display:flex;flex-wrap:wrap;gap:7px;padding:7px 18px 12px 52px}
+    .entry-photo{width:80px;height:80px;object-fit:cover;border-radius:4px;border:2px solid #e8d5b8;box-shadow:2px 3px 8px rgba(0,0,0,.12);cursor:pointer;transition:transform .15s}
     .entry-photo:hover{transform:scale(1.05) rotate(1deg)}
-    .entry-actions-bar{display:flex;gap:8px;padding:0 20px 12px 56px}
-    .edit-btn{padding:3px 12px;border-radius:12px;border:1px solid #c8a87a;background:transparent;font-family:'Lora',serif;font-size:.75rem;color:#7a5230;cursor:pointer}
-    .edit-btn:hover{background:rgba(200,145,90,.12)}
-    .delete-btn{padding:3px 12px;border-radius:12px;border:1px solid #e8b8b8;background:transparent;font-family:'Lora',serif;font-size:.75rem;color:#b07070;cursor:pointer}
-    .delete-btn:hover{background:rgba(220,100,80,.08)}
+    .entry-actions-bar{position:absolute;top:8px;right:8px;display:flex;gap:4px;opacity:0;transition:opacity .2s;z-index:2}
+    .entry-card:hover .entry-actions-bar{opacity:1}
+    .entry-action-btn{background:transparent;border:1px solid #c8a882;border-radius:8px;color:#a07850;font-size:.7rem;cursor:pointer;padding:3px 7px;transition:all .15s;font-family:'Lora',serif}
+    .entry-action-btn:hover{background:#c8915a;color:white;border-color:#c8915a}
+    .entry-action-btn.del:hover{background:#c85a5a;border-color:#c85a5a}
+    /* GALLERY */
+    .gallery-wrapper{max-width:640px;margin:16px auto 60px;padding:0 16px}
+    .gallery-header{font-family:'Caveat',cursive;font-size:1.3rem;color:#a07040;text-align:center;margin-bottom:16px}
+    .gallery-filter{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+    .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+    .gallery-item{position:relative;aspect-ratio:1;overflow:hidden;border-radius:6px;border:2px solid #e8d5b8;box-shadow:2px 3px 8px rgba(0,0,0,.1);cursor:pointer;transition:transform .15s}
+    .gallery-item:hover{transform:scale(1.03)}
+    .gallery-item img{width:100%;height:100%;object-fit:cover}
+    .gallery-item-meta{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(50,25,5,.6));padding:4px 5px;font-size:.6rem;color:rgba(255,255,255,.9);font-style:italic}
+    .gallery-tag-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:3px;vertical-align:middle}
+    .gallery-tag-dot.Felles{background:#60a060}
+    .gallery-tag-dot.Liv{background:#c07090}
+    .gallery-tag-dot.Lara{background:#6080c0}
+    /* CALENDAR */
+    .calendar-wrapper{max-width:640px;margin:16px auto 0;padding:0 16px}
+    .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .cal-title{font-family:'Caveat',cursive;font-size:1.5rem;color:#5c3d1e}
+    .cal-nav-btn{background:transparent;border:1.5px solid #c8a87a;border-radius:50%;width:32px;height:32px;font-size:1rem;color:#7a5230;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+    .cal-nav-btn:hover{background:#c8915a;color:white;border-color:#c8915a}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+    .cal-day-name{text-align:center;font-size:.68rem;color:#b09070;font-style:italic;padding:3px 0}
+    .cal-day{min-height:42px;border-radius:6px;border:1px solid rgba(180,130,80,.15);background:#fffdf7;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:3px 2px;cursor:pointer;transition:all .15s;position:relative}
+    .cal-day:hover{border-color:#c8915a;background:rgba(200,145,90,.08)}
+    .cal-day.today{border-color:#c8915a;background:rgba(200,145,90,.12)}
+    .cal-day.selected{background:#c8915a;border-color:#c8915a}
+    .cal-day.other-month{opacity:.3}
+    .cal-day.has-entries{background:#f0e8d8}
+    .cal-day.selected .cal-day-num{color:white}
+    .cal-day-num{font-family:'Caveat',cursive;font-size:.95rem;color:#5c3d1e}
+    .cal-dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;margin-top:2px}
+    .cal-dot{width:5px;height:5px;border-radius:50%}
+    .cal-dot.Felles{background:#60a060}.cal-dot.Liv{background:#c07090}.cal-dot.Lara{background:#6080c0}
+    .cal-day-entries{max-width:640px;margin:14px auto 60px;padding:0 16px}
+    .cal-day-title{font-family:'Caveat',cursive;font-size:1.3rem;color:#a07040;text-align:center;margin-bottom:14px}
+    /* EXPORT */
+    .export-wrapper{max-width:640px;margin:16px auto 60px;padding:0 16px}
+    .export-card{background:#fffdf7;border-radius:6px;box-shadow:0 2px 12px rgba(100,60,20,.1),0 0 0 1px rgba(180,130,80,.12);padding:24px 26px}
+    .export-title{font-family:'Caveat',cursive;font-size:1.5rem;color:#5c3d1e;margin-bottom:20px}
+    .export-section{margin-bottom:18px}
+    .export-label{font-size:.8rem;color:#a07850;font-style:italic;margin-bottom:8px;display:block}
+    .export-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .export-tag-btn{padding:4px 14px;border-radius:14px;border:1.5px solid #c8a87a;background:transparent;font-family:'Lora',serif;font-size:.8rem;color:#7a5230;cursor:pointer;transition:all .15s}
+    .export-tag-btn.active{background:#c8915a;color:white;border-color:#c8915a}
+    .export-tag-btn:hover:not(.active){background:rgba(200,145,90,.12)}
+    .export-date-input{padding:5px 9px;border:1px solid #c8a87a;border-radius:7px;font-family:'Lora',serif;font-size:.82rem;color:#5c3d1e;background:#fffdf7}
+    .export-toggle{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+    .export-toggle input[type=checkbox]{width:16px;height:16px;accent-color:#c8915a;cursor:pointer}
+    .export-toggle label{font-size:.85rem;color:#5c3d1e;cursor:pointer}
+    .layout-option{display:flex;align-items:center;gap:8px;padding:10px 14px;border:1.5px solid #c8a87a;border-radius:8px;cursor:pointer;transition:all .15s;margin-bottom:8px}
+    .layout-option.active{border-color:#c8915a;background:rgba(200,145,90,.08)}
+    .layout-option input[type=radio]{accent-color:#c8915a}
+    .layout-icon{font-size:1.4rem}
+    .layout-desc{font-size:.82rem;color:#5c3d1e}
+    .layout-desc strong{display:block;font-size:.88rem}
+    .export-btn{width:100%;padding:12px;background:#7a5230;color:#f5ede0;border:none;border-radius:20px;font-family:'Lora',serif;font-size:.95rem;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(100,60,20,.2);margin-top:6px}
+    .export-btn:hover{background:#5c3d1e;transform:translateY(-1px)}
+    .export-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+    .export-preview-count{text-align:center;font-size:.78rem;color:#b09070;font-style:italic;margin-top:10px}
+    /* EDIT MODAL */
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(30,15,5,.6);z-index:9000;align-items:center;justify-content:center;padding:20px}
     .modal-overlay.active{display:flex}
-    .modal{background:#fffdf7;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,.2);padding:28px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;position:relative}
-    .modal-title{font-family:'Caveat',cursive;font-size:1.5rem;color:#5c3d1e;margin-bottom:20px}
-    .modal-field{margin-bottom:16px}
-    .modal-label{font-size:.8rem;color:#a07850;font-style:italic;margin-bottom:6px;display:block}
-    .modal-textarea{width:100%;min-height:120px;border:1px solid #c8a87a;border-radius:6px;padding:10px;font-family:'Lora',serif;font-size:.93rem;color:#3d2b14;resize:vertical;background:#fffdf7;outline:none}
+    .modal{background:#fffdf7;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,.2);width:100%;max-width:600px;max-height:90vh;overflow-y:auto;padding:26px;position:relative}
+    .modal-title{font-family:'Caveat',cursive;font-size:1.5rem;color:#5c3d1e;margin-bottom:18px}
+    .modal-label{font-size:.78rem;color:#a07850;font-style:italic;margin-bottom:6px;display:block}
+    .modal-textarea{width:100%;min-height:110px;border:1px solid #c8a87a;border-radius:6px;padding:10px 12px;font-family:'Lora',serif;font-size:.93rem;color:#3d2b14;line-height:1.7;resize:vertical;background:#fffdf7;outline:none;margin-bottom:14px}
+    .modal-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
     .modal-date-input{padding:6px 10px;border:1px solid #c8a87a;border-radius:6px;font-family:'Lora',serif;font-size:.85rem;color:#5c3d1e;background:#fffdf7}
-    .modal-tag-row{display:flex;gap:8px;flex-wrap:wrap}
-    .modal-photos-preview{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .modal-photos{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
     .modal-photo-wrap{position:relative}
-    .modal-photo-thumb{width:70px;height:70px;object-fit:cover;border-radius:4px;border:2px solid #e8d5b8}
-    .modal-photo-remove{position:absolute;top:-6px;right:-6px;width:18px;height:18px;background:#7a5230;color:white;border-radius:50%;border:none;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-    .modal-add-photo{display:flex;align-items:center;gap:6px;font-size:.8rem;color:#a07850;cursor:pointer;padding:6px 12px;border-radius:16px;border:1px dashed #c8a87a;margin-top:8px;width:fit-content}
-    .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
-    .modal-cancel{padding:8px 20px;background:transparent;border:1.5px solid #c8a87a;border-radius:20px;font-family:'Lora',serif;font-size:.85rem;color:#7a5230;cursor:pointer}
-    .modal-save{padding:8px 20px;background:#7a5230;color:#f5ede0;border:none;border-radius:20px;font-family:'Lora',serif;font-size:.85rem;cursor:pointer}
-    .modal-save:hover{background:#5c3d1e}
-    .modal-close{position:absolute;top:14px;right:16px;background:transparent;border:none;font-size:1.4rem;color:#c8a882;cursor:pointer}
-    #calendar-view{display:none;max-width:640px;margin:22px auto 60px;padding:0 16px}
-    .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-    .cal-title{font-family:'Caveat',cursive;font-size:1.6rem;color:#5c3d1e}
-    .cal-nav{background:transparent;border:1.5px solid #c8a87a;border-radius:20px;padding:4px 14px;font-family:'Lora',serif;font-size:.85rem;color:#7a5230;cursor:pointer}
-    .cal-nav:hover{background:rgba(200,145,90,.12)}
-    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-    .cal-day-name{text-align:center;font-size:.72rem;color:#a07850;font-style:italic;padding:4px 0}
-    .cal-day{min-height:48px;border-radius:4px;padding:4px;cursor:pointer;transition:all .15s;position:relative;background:#fffdf7;border:1px solid rgba(180,130,80,.1)}
-    .cal-day:hover{background:rgba(200,145,90,.1)}
-    .cal-day.other-month{opacity:.35}
-    .cal-day.today{border-color:#c8915a;border-width:2px}
-    .cal-day.selected{background:rgba(200,145,90,.2);border-color:#c8915a}
-    .cal-day.has-entries{background:#fff8ee}
-    .cal-day-num{font-size:.8rem;color:#5c3d1e;font-weight:600}
-    .cal-dots{display:flex;flex-wrap:wrap;gap:2px;margin-top:3px}
-    .cal-dot{width:6px;height:6px;border-radius:50%}
-    .cal-dot.Felles{background:#68a068}
-    .cal-dot.Liv{background:#c870a0}
-    .cal-dot.Lara{background:#6080c8}
-    .cal-dot.unknown{background:#c8a87a}
-    .cal-selected-entries{margin-top:20px}
-    .cal-selected-title{font-family:'Caveat',cursive;font-size:1.2rem;color:#a07040;margin-bottom:12px}
-    #lightbox{display:none;position:fixed;inset:0;background:rgba(30,15,5,.88);z-index:10000;align-items:center;justify-content:center;cursor:pointer}
+    .modal-photo{width:68px;height:68px;object-fit:cover;border-radius:4px;border:2px solid #e8d5b8}
+    .modal-photo-remove{position:absolute;top:-5px;right:-5px;width:16px;height:16px;background:#c85a5a;color:white;border-radius:50%;border:none;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:10px}
+    .modal-save-btn{padding:9px 22px;background:#7a5230;color:#f5ede0;border:none;border-radius:18px;font-family:'Lora',serif;font-size:.88rem;cursor:pointer;transition:all .2s}
+    .modal-save-btn:hover{background:#5c3d1e}
+    .modal-cancel-btn{padding:9px 18px;background:transparent;border:1px solid #c8a882;border-radius:18px;font-family:'Lora',serif;font-size:.88rem;color:#7a5230;cursor:pointer}
+    .modal-cancel-btn:hover{background:rgba(200,145,90,.1)}
+    .modal-close{position:absolute;top:12px;right:14px;background:transparent;border:none;font-size:1.3rem;color:#a07850;cursor:pointer}
+    /* VIDEO THUMBS */
+    .entry-video-thumb{width:80px;height:80px;border-radius:4px;border:2px solid #e8d5b8;box-shadow:2px 3px 8px rgba(0,0,0,.12);cursor:pointer;transition:transform .15s;position:relative;display:inline-flex;align-items:center;justify-content:center;background:#2a1a0a;overflow:hidden;vertical-align:top}
+    .entry-video-thumb:hover{transform:scale(1.05)}
+    .entry-video-thumb video{width:100%;height:100%;object-fit:cover;pointer-events:none}
+    .entry-video-play{position:absolute;width:28px;height:28px;background:rgba(255,255,255,.85);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;pointer-events:none}
+    .gallery-video-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:32px;height:32px;background:rgba(255,255,255,.8);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;pointer-events:none}
+    /* SLIDESHOW LIGHTBOX */
+    #lightbox{display:none;position:fixed;inset:0;background:rgba(20,10,3,.95);z-index:10000;flex-direction:column;align-items:center;justify-content:center;user-select:none}
     #lightbox.active{display:flex}
-    #lightbox img{max-width:90vw;max-height:85vh;border-radius:4px;cursor:default}
-    #lightbox-close{position:absolute;top:20px;right:24px;background:transparent;border:none;color:#e8d5b8;font-size:2rem;cursor:pointer}
+    #lb-img{max-width:92vw;max-height:76vh;border-radius:6px;object-fit:contain;cursor:default;box-shadow:0 8px 40px rgba(0,0,0,.5);display:block}
+    #lb-vid{max-width:92vw;max-height:76vh;border-radius:6px;outline:none;display:none;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+    #lightbox-close{position:absolute;top:14px;right:18px;background:transparent;border:none;color:#e8d5b8;font-size:2rem;cursor:pointer;z-index:3;line-height:1}
+    #lb-caption{color:rgba(232,213,184,.75);font-size:.78rem;font-style:italic;text-align:center;margin-top:8px;max-width:80vw}
+    #lb-counter{color:rgba(232,213,184,.5);font-size:.7rem;margin-top:3px;text-align:center}
+    .lb-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.13);border:none;color:#e8d5b8;font-size:1.6rem;width:42px;height:42px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;z-index:3}
+    .lb-nav:hover{background:rgba(255,255,255,.28)}
+    #lb-prev{left:12px}#lb-next{right:12px}
+    .lb-dots{display:flex;gap:6px;justify-content:center;margin-top:7px;flex-wrap:wrap}
+    .lb-dot{width:7px;height:7px;border-radius:50%;background:rgba(232,213,184,.3);cursor:pointer;transition:background .15s;border:none}
+    .lb-dot.active{background:rgba(232,213,184,.9)}
     #toast{display:none;position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#5c3d1e;color:#f5ede0;padding:10px 22px;border-radius:20px;font-size:.86rem;z-index:10001;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2)}
     .loading{text-align:center;padding:40px;color:#b09070;font-style:italic}
     .empty-state{text-align:center;padding:40px 20px;color:#b09070;font-style:italic}
@@ -151,6 +211,7 @@
 </head>
 <body>
 
+<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-book">📖</div>
   <div class="login-title">Familiedagbok</div>
@@ -160,9 +221,10 @@
     <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
     Logg inn med Google
   </button>
-  <div class="login-note">Innleggene lagres på din Google Drive.</div>
+  <div class="login-note">Innleggene lagres i «Familiedagbok»-mappen på din Google Drive.</div>
 </div>
 
+<!-- APP -->
 <div id="app-screen">
   <div class="header">
     <div class="header-title">Familiedagbok</div>
@@ -175,34 +237,43 @@
     <button class="signout-btn" onclick="handleSignOut()">Logg ut</button>
   </div>
   <div class="sync-bar"><span class="sync-dot" id="sync-dot"></span><span id="sync-label">Klar</span></div>
-  <div id="app-error" class="error-box" style="display:none;max-width:608px;margin:12px auto"></div>
+  <div id="app-error" class="error-box" style="display:none;max-width:608px;margin:10px auto;"></div>
 
-  <div class="view-tabs">
-    <button class="view-tab active" id="tab-list" onclick="switchView('list')">📋 Innlegg</button>
-    <button class="view-tab" id="tab-calendar" onclick="switchView('calendar')">📅 Kalender</button>
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab-write" onclick="switchTab('write')">✍️ Skriv</button>
+    <button class="tab-btn" id="tab-entries" onclick="switchTab('entries')">📋 Innlegg</button>
+    <button class="tab-btn" id="tab-gallery" onclick="switchTab('gallery')">🖼️ Galleri</button>
+    <button class="tab-btn" id="tab-calendar" onclick="switchTab('calendar')">📅 Kalender</button>
+    <button class="tab-btn" id="tab-export" onclick="switchTab('export')">📄 Eksport</button>
   </div>
 
-  <div id="list-view">
+  <!-- WRITE -->
+  <div class="view active" id="view-write">
     <div class="new-entry-wrapper">
       <div class="new-entry-card">
         <div class="new-entry-label">Skriv dagens tanker...</div>
         <textarea id="entry-textarea" placeholder="Det skjedde noe fint i dag..."></textarea>
-        <div class="tag-selector">
-          <span class="tag-selector-label">Tagg:</span>
+        <div class="entry-meta-row">
+          <span class="meta-label">Tagg:</span>
           <button class="tag-btn" id="tag-Felles" onclick="selectTag('Felles')">🌿 Felles</button>
           <button class="tag-btn" id="tag-Liv" onclick="selectTag('Liv')">🌸 Liv</button>
           <button class="tag-btn" id="tag-Lara" onclick="selectTag('Lara')">⭐ Lara</button>
         </div>
+        <div class="location-display" id="location-display">📍 Henter posisjon...</div>
         <div id="photo-previews"></div>
-        <div id="location-info" class="location-info"></div>
         <div class="entry-actions">
-          <label class="photo-label">📷 Bilder <span id="photo-count"></span>
-            <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="handlePhotos(this)" />
-          </label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <label class="photo-label">📷 Bilder<span id="photo-count"></span><input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="handlePhotos(this)"/></label>
+            <label class="photo-label">🎥 Video<span id="video-count"></span><input type="file" id="video-input" accept="video/*" multiple style="display:none" onchange="handleVideos(this)"/></label>
+          </div>
           <button class="submit-btn" id="submit-btn" onclick="handleSubmit()">Skriv inn ✦</button>
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- ENTRIES -->
+  <div class="view" id="view-entries">
     <div class="filter-bar">
       <div class="filter-card">
         <div class="filter-title">🔍 Filtrer innlegg</div>
@@ -216,9 +287,9 @@
         <div class="filter-row">
           <span class="filter-row-label">Dato:</span>
           <div class="date-inputs">
-            <input type="date" class="date-input" id="filter-from" onchange="renderEntries()" />
+            <input type="date" class="date-input" id="filter-from" onchange="renderEntries()"/>
             <span class="date-sep">→</span>
-            <input type="date" class="date-input" id="filter-to" onchange="renderEntries()" />
+            <input type="date" class="date-input" id="filter-to" onchange="renderEntries()"/>
           </div>
           <button class="filter-clear" onclick="clearFilters()">Nullstill</button>
         </div>
@@ -227,58 +298,135 @@
     <div class="entries-section">
       <div class="entries-header">— Våre innlegg —</div>
       <div id="entries-count" class="entries-count"></div>
-      <div id="entries-list"><div class="loading">Laster dagboken fra Drive...</div></div>
+      <div id="entries-list"><div class="loading">Laster dagboken...</div></div>
     </div>
   </div>
 
-  <div id="calendar-view">
-    <div class="cal-header">
-      <button class="cal-nav" onclick="calPrev()">← Forrige</button>
-      <div class="cal-title" id="cal-title"></div>
-      <button class="cal-nav" onclick="calNext()">Neste →</button>
+  <!-- GALLERY -->
+  <div class="view" id="view-gallery">
+    <div class="gallery-wrapper">
+      <div class="gallery-header">— Galleri —</div>
+      <div class="gallery-filter">
+        <button class="filter-tag-btn active" id="gtag-Alle" onclick="setGalleryTag('Alle')">Alle</button>
+        <button class="filter-tag-btn" id="gtag-Felles" onclick="setGalleryTag('Felles')">🌿 Felles</button>
+        <button class="filter-tag-btn" id="gtag-Liv" onclick="setGalleryTag('Liv')">🌸 Liv</button>
+        <button class="filter-tag-btn" id="gtag-Lara" onclick="setGalleryTag('Lara')">⭐ Lara</button>
+      </div>
+      <div class="gallery-grid" id="gallery-grid"></div>
     </div>
-    <div class="cal-grid" id="cal-grid"></div>
-    <div class="cal-selected-entries" id="cal-selected-entries"></div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="view" id="view-calendar">
+    <div class="calendar-wrapper">
+      <div class="cal-header">
+        <button class="cal-nav-btn" onclick="calPrev()">‹</button>
+        <div class="cal-title" id="cal-title"></div>
+        <button class="cal-nav-btn" onclick="calNext()">›</button>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+    <div class="cal-day-entries" id="cal-day-entries" style="display:none">
+      <div class="cal-day-title" id="cal-day-title"></div>
+      <div id="cal-entries-list"></div>
+    </div>
+  </div>
+
+  <!-- EXPORT -->
+  <div class="view" id="view-export">
+    <div class="export-wrapper">
+      <div class="export-card">
+        <div class="export-title">📄 Eksporter til PDF</div>
+
+        <div class="export-section">
+          <span class="export-label">Filtrer på tagg</span>
+          <div class="export-row">
+            <button class="export-tag-btn active" id="xtag-Alle" onclick="setExportTag('Alle')">Alle</button>
+            <button class="export-tag-btn" id="xtag-Felles" onclick="setExportTag('Felles')">🌿 Felles</button>
+            <button class="export-tag-btn" id="xtag-Liv" onclick="setExportTag('Liv')">🌸 Liv</button>
+            <button class="export-tag-btn" id="xtag-Lara" onclick="setExportTag('Lara')">⭐ Lara</button>
+          </div>
+        </div>
+
+        <div class="export-section">
+          <span class="export-label">Datoperiode</span>
+          <div class="export-row">
+            <input type="date" class="export-date-input" id="export-from" onchange="updateExportCount()"/>
+            <span class="date-sep">→</span>
+            <input type="date" class="export-date-input" id="export-to" onchange="updateExportCount()"/>
+          </div>
+        </div>
+
+        <div class="export-section">
+          <span class="export-label">Innhold</span>
+          <div class="export-toggle"><input type="checkbox" id="inc-photos" checked onchange="updateExportCount()"/><label for="inc-photos">Inkluder bilder</label></div>
+          <div class="export-toggle"><input type="checkbox" id="inc-location" checked/><label for="inc-location">Inkluder sted/lokasjon</label></div>
+          <div class="export-toggle"><input type="checkbox" id="inc-edits" checked/><label for="inc-edits">Vis redigeringshistorikk</label></div>
+        </div>
+
+        <div class="export-section">
+          <span class="export-label">Layout</span>
+          <label class="layout-option active" id="layout-journal" onclick="selectLayout('journal')">
+            <input type="radio" name="layout" value="journal" checked/>
+            <span class="layout-icon">📖</span>
+            <span class="layout-desc"><strong>Dagbok</strong>Tekst og bilder per innlegg, som en dagbok</span>
+          </label>
+          <label class="layout-option" id="layout-photo" onclick="selectLayout('photo')">
+            <input type="radio" name="layout" value="photo"/>
+            <span class="layout-icon">📷</span>
+            <span class="layout-desc"><strong>Fotobok</strong>Store bilder med tekst under</span>
+          </label>
+          <label class="layout-option" id="layout-minimal" onclick="selectLayout('minimal')">
+            <input type="radio" name="layout" value="minimal"/>
+            <span class="layout-icon">📝</span>
+            <span class="layout-desc"><strong>Minimalistisk</strong>Kun tekst, ingen bilder</span>
+          </label>
+        </div>
+
+        <div class="export-preview-count" id="export-count"></div>
+        <button class="export-btn" id="export-btn" onclick="generatePDF()">Last ned PDF 📥</button>
+      </div>
+    </div>
   </div>
 </div>
 
+<!-- EDIT MODAL -->
 <div class="modal-overlay" id="edit-modal">
   <div class="modal">
     <button class="modal-close" onclick="closeEditModal()">✕</button>
     <div class="modal-title">✏️ Rediger innlegg</div>
-    <div class="modal-field">
-      <label class="modal-label">Tekst</label>
-      <textarea class="modal-textarea" id="modal-text"></textarea>
+    <label class="modal-label">Tekst</label>
+    <textarea class="modal-textarea" id="edit-text"></textarea>
+    <label class="modal-label">Tagg</label>
+    <div class="modal-row">
+      <button class="tag-btn" id="etag-Felles" onclick="selectEditTag('Felles')">🌿 Felles</button>
+      <button class="tag-btn" id="etag-Liv" onclick="selectEditTag('Liv')">🌸 Liv</button>
+      <button class="tag-btn" id="etag-Lara" onclick="selectEditTag('Lara')">⭐ Lara</button>
     </div>
-    <div class="modal-field">
-      <label class="modal-label">Tagg</label>
-      <div class="modal-tag-row">
-        <button class="tag-btn" id="modal-tag-Felles" onclick="selectModalTag('Felles')">🌿 Felles</button>
-        <button class="tag-btn" id="modal-tag-Liv" onclick="selectModalTag('Liv')">🌸 Liv</button>
-        <button class="tag-btn" id="modal-tag-Lara" onclick="selectModalTag('Lara')">⭐ Lara</button>
-      </div>
+    <label class="modal-label" style="margin-top:6px">Dato</label>
+    <div class="modal-row"><input type="datetime-local" class="modal-date-input" id="edit-date"/></div>
+    <label class="modal-label">Bilder og videoer</label>
+    <div class="modal-photos" id="edit-photos"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      <label class="photo-label" style="display:inline-flex">📷 Bilder<input type="file" id="edit-photo-input" accept="image/*" multiple style="display:none" onchange="handleEditPhotos(this)"/></label>
+      <label class="photo-label" style="display:inline-flex">🎥 Video<input type="file" id="edit-video-input" accept="video/*" multiple style="display:none" onchange="handleEditVideos(this)"/></label>
     </div>
-    <div class="modal-field">
-      <label class="modal-label">Dato og tid</label>
-      <input type="datetime-local" class="modal-date-input" id="modal-date" />
-    </div>
-    <div class="modal-field">
-      <label class="modal-label">Bilder</label>
-      <div class="modal-photos-preview" id="modal-photos-preview"></div>
-      <label class="modal-add-photo">📷 Legg til bilder
-        <input type="file" accept="image/*" multiple style="display:none" onchange="handleModalPhotos(this)" />
-      </label>
-    </div>
-    <div class="modal-footer">
-      <button class="modal-cancel" onclick="closeEditModal()">Avbryt</button>
-      <button class="modal-save" onclick="saveEdit()">Lagre endringer</button>
+    <div class="modal-actions">
+      <button class="modal-cancel-btn" onclick="closeEditModal()">Avbryt</button>
+      <button class="modal-save-btn" onclick="saveEdit()">Lagre endringer</button>
     </div>
   </div>
 </div>
 
-<div id="lightbox" onclick="closeLightbox()">
+<div id="lightbox">
   <button id="lightbox-close" onclick="closeLightbox()">✕</button>
-  <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()" />
+  <button class="lb-nav" id="lb-prev" onclick="lbNav(-1)">‹</button>
+  <img id="lb-img" src="" alt=""/>
+  <video id="lb-vid" controls playsinline></video>
+  <button class="lb-nav" id="lb-next" onclick="lbNav(1)">›</button>
+  <div id="lb-caption"></div>
+  <div id="lb-counter"></div>
+  <div class="lb-dots" id="lb-dots"></div>
 </div>
 <div id="toast"></div>
 
@@ -286,17 +434,17 @@
 const CLIENT_ID="885648821523-iadmhinq9a8lfj7249cqs6aapqej6pap.apps.googleusercontent.com";
 const REDIRECT_URI="https://plompage.github.io/Familiedagbok/";
 const SCOPES="https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile";
-const FOLDER_NAME="Familiedagbok";
-const ENTRIES_FILE="dagbok-entries.json";
+const FOLDER_NAME="Familiedagbok",ENTRIES_FILE="dagbok-entries.json";
 const AUTHOR_MAP={"plompage@gmail.com":"Erik","mialunder@gmail.com":"Mia"};
 
 let accessToken=null,userName="",folderId=null,fileId=null;
 let entries=[],pendingPhotos=[],selectedTag="Felles",filterTag="Alle";
-let syncInterval=null,currentView="list";
+let galleryTag="Alle",exportTag="Alle",exportLayout="journal";
+let syncInterval=null,currentLocation=null;
 let calYear=new Date().getFullYear(),calMonth=new Date().getMonth(),calSelectedDate=null;
-let editingId=null,modalPhotos=[],modalTag="Felles";
-let currentLocation=null;
+let editingId=null,editPhotos=[];
 
+// AUTH
 function handleLogin(){
   const state=Math.random().toString(36).substring(2);
   sessionStorage.setItem("oauth_state",state);
@@ -304,7 +452,7 @@ function handleLogin(){
   window.location.href="https://accounts.google.com/o/oauth2/v2/auth?"+p;
 }
 function handleSignOut(){
-  if(accessToken) fetch("https://oauth2.googleapis.com/revoke?token="+accessToken,{method:"POST"});
+  if(accessToken)fetch("https://oauth2.googleapis.com/revoke?token="+accessToken,{method:"POST"});
   accessToken=null;folderId=null;fileId=null;entries=[];
   sessionStorage.removeItem("oauth_state");clearInterval(syncInterval);
   document.getElementById("app-screen").style.display="none";
@@ -312,245 +460,531 @@ function handleSignOut(){
   history.replaceState(null,"",window.location.pathname);
 }
 function parseTokenFromHash(){
-  const hash=window.location.hash.substring(1);if(!hash) return null;
-  const p=new URLSearchParams(hash);const token=p.get("access_token"),state=p.get("state");
+  const hash=window.location.hash.substring(1);if(!hash)return null;
+  const p=new URLSearchParams(hash);
+  const token=p.get("access_token"),state=p.get("state");
   if(token&&state&&state===sessionStorage.getItem("oauth_state")){
-    history.replaceState(null,"",window.location.pathname);sessionStorage.removeItem("oauth_state");return token;
+    history.replaceState(null,"",window.location.pathname);
+    sessionStorage.removeItem("oauth_state");return token;
   }return null;
 }
-window.addEventListener("load",async()=>{const token=parseTokenFromHash();if(token){accessToken=token;await afterLogin();}});
+window.addEventListener("load",async()=>{
+  const token=parseTokenFromHash();
+  if(token){accessToken=token;await afterLogin();}
+  getLocation();
+});
 async function afterLogin(){
   try{
     const r=await fetch("https://www.googleapis.com/oauth2/v3/userinfo",{headers:{Authorization:"Bearer "+accessToken}});
-    const d=await r.json();const email=(d.email||"").toLowerCase();
-    userName=AUTHOR_MAP[email]||d.given_name||email;
+    const d=await r.json();
+    userName=AUTHOR_MAP[(d.email||"").toLowerCase()]||d.given_name||d.email||"Ukjent";
   }catch{userName="Ukjent";}
   document.getElementById("user-name-display").textContent="✍️ "+userName;
   document.getElementById("login-screen").style.display="none";
   document.getElementById("app-screen").style.display="block";
-  getLocation();await loadDriveData();
+  await loadDriveData();
   syncInterval=setInterval(()=>loadDriveData(true),30000);
 }
 
+// LOCATION
 function getLocation(){
-  if(!navigator.geolocation) return;
-  navigator.geolocation.getCurrentPosition(pos=>{
-    const {latitude:lat,longitude:lon}=pos.coords;
-    fetch("https://nominatim.openstreetmap.org/reverse?lat="+lat+"&lon="+lon+"&format=json")
-      .then(r=>r.json()).then(d=>{
-        const a=d.address||{};
-        currentLocation=a.city||a.town||a.village||a.municipality||a.county||"";
-        if(currentLocation) document.getElementById("location-info").textContent="📍 "+currentLocation;
-      }).catch(()=>{});
-  },()=>{});
+  if(!navigator.geolocation){document.getElementById("location-display").textContent="📍 Ikke tilgjengelig";return;}
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const{latitude:lat,longitude:lon}=pos.coords;
+    currentLocation={lat,lon};
+    try{
+      const r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+      const d=await r.json();
+      const place=d.address?.city||d.address?.town||d.address?.village||d.address?.municipality||"";
+      const country=d.address?.country||"";
+      const label=[place,country].filter(Boolean).join(", ");
+      currentLocation.label=label;
+      document.getElementById("location-display").textContent=label?"📍 "+label:"📍 Posisjon hentet";
+    }catch{document.getElementById("location-display").textContent="📍 Posisjon hentet";}
+  },()=>{document.getElementById("location-display").textContent="📍 Ikke tilgjengelig";currentLocation=null;});
 }
 
-function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(()=>t.style.display="none",3000)}
-function setSyncing(a,l){document.getElementById("sync-dot").className="sync-dot"+(a?" syncing":"");if(l)document.getElementById("sync-label").textContent=l}
-function formatDate(iso){return new Date(iso).toLocaleDateString("nb-NO",{weekday:"long",year:"numeric",month:"long",day:"numeric",hour:"2-digit",minute:"2-digit"})}
-function toDatetimeLocal(iso){const d=new Date(iso);const pad=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+"T"+pad(d.getHours())+":"+pad(d.getMinutes())}
-function resizeImage(dataUrl,maxPx=1200){return new Promise(res=>{const img=new Image();img.onload=()=>{const scale=Math.min(1,maxPx/Math.max(img.width,img.height));const canvas=document.createElement("canvas");canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);res(canvas.toDataURL("image/jpeg",.78))};img.src=dataUrl})}
+// TABS
+function switchTab(tab){
+  ["write","entries","gallery","calendar","export"].forEach(t=>{
+    document.getElementById("view-"+t).classList.toggle("active",t===tab);
+    document.getElementById("tab-"+t).classList.toggle("active",t===tab);
+  });
+  if(tab==="calendar")renderCalendar();
+  if(tab==="entries")renderEntries();
+  if(tab==="gallery")renderGallery();
+  if(tab==="export")updateExportCount();
+}
 
-function selectTag(tag){selectedTag=tag;["Felles","Liv","Lara"].forEach(t=>document.getElementById("tag-"+t).classList.toggle("active",t===tag))}
-function setFilterTag(tag){filterTag=tag;["Alle","Felles","Liv","Lara"].forEach(t=>document.getElementById("ftag-"+t).classList.toggle("active",t===tag));renderEntries()}
-function clearFilters(){setFilterTag("Alle");document.getElementById("filter-from").value="";document.getElementById("filter-to").value="";renderEntries()}
+// TAGS
+function selectTag(tag){selectedTag=tag;["Felles","Liv","Lara"].forEach(t=>document.getElementById("tag-"+t).classList.toggle("active",t===tag));}
+selectTag("Felles");
+function selectEditTag(tag){["Felles","Liv","Lara"].forEach(t=>document.getElementById("etag-"+t).classList.toggle("active",t===tag));}
+function setFilterTag(tag){filterTag=tag;["Alle","Felles","Liv","Lara"].forEach(t=>document.getElementById("ftag-"+t).classList.toggle("active",t===tag));renderEntries();}
+function clearFilters(){setFilterTag("Alle");document.getElementById("filter-from").value="";document.getElementById("filter-to").value="";renderEntries();}
+function setGalleryTag(tag){galleryTag=tag;["Alle","Felles","Liv","Lara"].forEach(t=>document.getElementById("gtag-"+t).classList.toggle("active",t===tag));renderGallery();}
+function setExportTag(tag){exportTag=tag;["Alle","Felles","Liv","Lara"].forEach(t=>document.getElementById("xtag-"+t).classList.toggle("active",t===tag));updateExportCount();}
+function selectLayout(l){exportLayout=l;["journal","photo","minimal"].forEach(x=>document.getElementById("layout-"+x).classList.toggle("active",x===l));}
+
 function getFilteredEntries(){
   const from=document.getElementById("filter-from").value,to=document.getElementById("filter-to").value;
   return entries.filter(e=>{
-    if(filterTag!=="Alle"&&e.tag!==filterTag) return false;
-    if(from&&e.date<from) return false;
-    if(to&&e.date>to+"T23:59:59") return false;
+    if(filterTag!=="Alle"&&e.tag!==filterTag)return false;
+    if(from&&e.date<from)return false;
+    if(to&&e.date>to+"T23:59:59")return false;
     return true;
   });
 }
-selectTag("Felles");
-
-function switchView(v){
-  currentView=v;
-  document.getElementById("list-view").style.display=v==="list"?"block":"none";
-  document.getElementById("calendar-view").style.display=v==="calendar"?"block":"none";
-  document.getElementById("tab-list").classList.toggle("active",v==="list");
-  document.getElementById("tab-calendar").classList.toggle("active",v==="calendar");
-  if(v==="calendar") renderCalendar();
+function getExportEntries(){
+  const from=document.getElementById("export-from").value,to=document.getElementById("export-to").value;
+  return entries.filter(e=>{
+    if(exportTag!=="Alle"&&e.tag!==exportTag)return false;
+    if(from&&e.date<from)return false;
+    if(to&&e.date>to+"T23:59:59")return false;
+    return true;
+  }).sort((a,b)=>a.date.localeCompare(b.date));
+}
+function updateExportCount(){
+  const n=getExportEntries().length;
+  document.getElementById("export-count").textContent=`${n} innlegg vil bli inkludert`;
 }
 
+// UTILS
+function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(()=>t.style.display="none",3000);}
+function setSyncing(active,label){document.getElementById("sync-dot").className="sync-dot"+(active?" syncing":"");if(label)document.getElementById("sync-label").textContent=label;}
+function formatDate(iso){return new Date(iso).toLocaleDateString("nb-NO",{weekday:"long",year:"numeric",month:"long",day:"numeric",hour:"2-digit",minute:"2-digit"});}
+function formatDateShort(iso){return new Date(iso).toLocaleDateString("nb-NO",{day:"numeric",month:"short",year:"numeric"});}
+function tagEmoji(tag){return tag==="Liv"?"🌸":tag==="Lara"?"⭐":"🌿";}
+function resizeImage(dataUrl,maxPx=1200){
+  return new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>{
+      const scale=Math.min(1,maxPx/Math.max(img.width,img.height));
+      const canvas=document.createElement("canvas");
+      canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);
+      canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);
+      res(canvas.toDataURL("image/jpeg",.78));
+    };img.src=dataUrl;
+  });
+}
+
+// DRIVE
 async function driveReq(method,path,params,body){
   const q=params?"?"+new URLSearchParams(params):"";
   const res=await fetch("https://www.googleapis.com/drive/v3"+path+q,{method,headers:{Authorization:"Bearer "+accessToken,"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});
-  if(!res.ok) throw new Error(await res.text());return res.json();
+  if(!res.ok)throw new Error(await res.text());return res.json();
 }
 async function getOrCreateFolder(){
-  const res=await driveReq("GET","/files",{q:"name='"+FOLDER_NAME+"' and mimeType='application/vnd.google-apps.folder' and trashed=false",fields:"files(id)"});
-  if(res.files?.length) return res.files[0].id;
+  const res=await driveReq("GET","/files",{q:`name='${FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,fields:"files(id)"});
+  if(res.files?.length)return res.files[0].id;
   const f=await driveReq("POST","/files",null,{name:FOLDER_NAME,mimeType:"application/vnd.google-apps.folder"});return f.id;
 }
 async function getEntriesFileId(fid){
-  const res=await driveReq("GET","/files",{q:"name='"+ENTRIES_FILE+"' and '"+fid+"' in parents and trashed=false",fields:"files(id)"});
+  const res=await driveReq("GET","/files",{q:`name='${ENTRIES_FILE}' and '${fid}' in parents and trashed=false`,fields:"files(id)"});
   return res.files?.[0]?.id||null;
 }
 async function readEntries(eid){
-  const res=await fetch("https://www.googleapis.com/drive/v3/files/"+eid+"?alt=media",{headers:{Authorization:"Bearer "+accessToken}});
-  if(!res.ok) throw new Error("Kunne ikke lese fil");return res.json();
+  const res=await fetch(`https://www.googleapis.com/drive/v3/files/${eid}?alt=media`,{headers:{Authorization:"Bearer "+accessToken}});
+  if(!res.ok)throw new Error("Kunne ikke lese fil");return res.json();
 }
 async function writeEntries(data){
-  const blob=new Blob([JSON.stringify(data)],{type:"application/json"});const form=new FormData();
+  const blob=new Blob([JSON.stringify(data)],{type:"application/json"});
+  const form=new FormData();
   if(fileId){
     form.append("metadata",new Blob([JSON.stringify({})],{type:"application/json"}));form.append("file",blob);
-    await fetch("https://www.googleapis.com/upload/drive/v3/files/"+fileId+"?uploadType=multipart",{method:"PATCH",headers:{Authorization:"Bearer "+accessToken},body:form});
+    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart`,{method:"PATCH",headers:{Authorization:"Bearer "+accessToken},body:form});
   }else{
     form.append("metadata",new Blob([JSON.stringify({name:ENTRIES_FILE,parents:[folderId]})],{type:"application/json"}));form.append("file",blob);
     const res=await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",{method:"POST",headers:{Authorization:"Bearer "+accessToken},body:form});
     const d=await res.json();fileId=d.id;
-    await driveReq("POST","/files/"+fileId+"/permissions",null,{role:"writer",type:"anyone"});
+    await driveReq("POST",`/files/${fileId}/permissions`,null,{role:"writer",type:"anyone"});
   }
 }
 async function loadDriveData(silent=false){
-  if(!silent) setSyncing(true,"Laster...");
+  if(!silent)setSyncing(true,"Laster...");
   try{
-    folderId=folderId||await getOrCreateFolder();fileId=fileId||await getEntriesFileId(folderId);
+    folderId=folderId||await getOrCreateFolder();
+    fileId=fileId||await getEntriesFileId(folderId);
     if(fileId){const data=await readEntries(fileId);entries=Array.isArray(data)?data:[];}else entries=[];
-    renderEntries();if(currentView==="calendar") renderCalendar();
+    renderEntries();
     const t=new Date().toLocaleTimeString("nb-NO",{hour:"2-digit",minute:"2-digit"});
-    setSyncing(false,"Sist synkronisert "+t);
-  }catch(e){setSyncing(false,"Synkronisering feilet");if(!silent){const el=document.getElementById("app-error");el.textContent="⚠️ "+e.message;el.style.display="block";}}
+    setSyncing(false,`Sist synkronisert ${t}`);
+  }catch(e){
+    setSyncing(false,"Synkronisering feilet");
+    if(!silent){const el=document.getElementById("app-error");el.textContent="⚠️ "+e.message;el.style.display="block";}
+  }
 }
 
+// PHOTOS & VIDEOS
 async function handlePhotos(input){
   const files=Array.from(input.files);
-  const dataUrls=await Promise.all(files.map(f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(f)})));
+  const dataUrls=await Promise.all(files.map(f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(f);})));
   const resized=await Promise.all(dataUrls.map(d=>resizeImage(d)));
-  pendingPhotos=[...pendingPhotos,...resized].slice(0,6);input.value="";renderPhotoPreviews();
+  pendingPhotos=[...pendingPhotos,...resized.map(src=>({type:"image",src}))].slice(0,6);
+  input.value="";renderPhotoPreviews();
+}
+async function handleVideos(input){
+  const files=Array.from(input.files);
+  for(const f of files){
+    if(pendingPhotos.length>=6){showToast("Maks 6 mediafiler per innlegg.");break;}
+    const src=await new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(f);});
+    pendingPhotos.push({type:"video",src});
+  }
+  input.value="";renderPhotoPreviews();
 }
 function renderPhotoPreviews(){
-  const el=document.getElementById("photo-previews"),cnt=document.getElementById("photo-count");
-  cnt.textContent=pendingPhotos.length;cnt.style.display=pendingPhotos.length?"inline":"none";
-  el.innerHTML=pendingPhotos.map((src,i)=>'<div class="photo-thumb-wrap"><img src="'+src+'" class="photo-thumb"/><button class="photo-remove" onclick="removePhoto('+i+')">×</button></div>').join("");
+  const imgs=pendingPhotos.filter(m=>m.type==="image").length;
+  const vids=pendingPhotos.filter(m=>m.type==="video").length;
+  const cnt=document.getElementById("photo-count");cnt.textContent=imgs||"";cnt.style.display=imgs?"inline":"none";
+  const vcnt=document.getElementById("video-count");vcnt.textContent=vids||"";vcnt.style.display=vids?"inline":"none";
+  document.getElementById("photo-previews").innerHTML=pendingPhotos.map((m,i)=>
+    m.type==="video"
+      ?`<div class="photo-thumb-wrap"><div style="width:56px;height:56px;background:#2a1a0a;border-radius:4px;border:2px solid #e8d5b8;display:flex;align-items:center;justify-content:center;font-size:1.5rem">🎥</div><button class="photo-remove" onclick="removePhoto(${i})">×</button></div>`
+      :`<div class="photo-thumb-wrap"><img src="${m.src}" class="photo-thumb"/><button class="photo-remove" onclick="removePhoto(${i})">×</button></div>`
+  ).join("");
 }
-function removePhoto(i){pendingPhotos.splice(i,1);renderPhotoPreviews()}
+function removePhoto(i){pendingPhotos.splice(i,1);renderPhotoPreviews();}
 
+// SUBMIT
 async function handleSubmit(){
-  const ta=document.getElementById("entry-textarea"),text=ta.value.trim();if(!text) return;
+  const ta=document.getElementById("entry-textarea");const text=ta.value.trim();if(!text)return;
   const btn=document.getElementById("submit-btn");btn.disabled=true;btn.textContent="Lagrer...";
-  const newEntry={id:Date.now().toString(),author:userName,tag:selectedTag,text,photos:[...pendingPhotos],date:new Date().toISOString(),location:currentLocation||null,editHistory:[]};
+  const newEntry={id:Date.now().toString(),author:userName,tag:selectedTag,text,
+    media:[...pendingPhotos],
+    photos:pendingPhotos.filter(m=>m.type==="image").map(m=>m.src),
+    date:new Date().toISOString(),
+    location:currentLocation?{label:currentLocation.label||"",lat:currentLocation.lat,lon:currentLocation.lon}:null,
+    editHistory:[]};
   const updated=[newEntry,...entries];
-  try{
-    await writeEntries(updated);entries=updated;ta.value="";pendingPhotos=[];
-    renderPhotoPreviews();renderEntries();if(currentView==="calendar") renderCalendar();showToast("Innlegg lagret! 📖");
-  }catch(e){showToast("Feil: "+e.message);}
+  try{await writeEntries(updated);entries=updated;ta.value="";pendingPhotos=[];renderPhotoPreviews();renderEntries();showToast("Innlegg lagret! 📖");}
+  catch(e){showToast("Feil: "+e.message);}
   btn.disabled=false;btn.textContent="Skriv inn ✦";
 }
 
+// DELETE
 async function deleteEntry(id){
-  if(!confirm("Slette dette innlegget?")) return;
+  if(!confirm("Slette dette innlegget?"))return;
   const updated=entries.filter(e=>e.id!==id);
-  try{await writeEntries(updated);entries=updated;renderEntries();if(currentView==="calendar")renderCalendar();showToast("Slettet.");}
+  try{await writeEntries(updated);entries=updated;renderEntries();renderGallery();showToast("Slettet.");}
   catch{showToast("Feil ved sletting.");}
 }
 
+// normalise entry media (backward compat with old photos[] only entries)
+function getEntryMedia(e){
+  if(e.media&&e.media.length)return e.media.map(m=>typeof m==="string"?{type:"image",src:m}:m);
+  return(e.photos||[]).map(s=>({type:"image",src:s}));
+}
+
+// EDIT
 function openEditModal(id){
-  const entry=entries.find(e=>e.id===id);if(!entry) return;
-  editingId=id;modalPhotos=[...(entry.photos||[])];modalTag=entry.tag||"Felles";
-  document.getElementById("modal-text").value=entry.text;
-  document.getElementById("modal-date").value=toDatetimeLocal(entry.date);
-  selectModalTag(modalTag);renderModalPhotos();
+  const e=entries.find(x=>x.id===id);if(!e)return;
+  editingId=id;
+  editPhotos=getEntryMedia(e).map(m=>({...m}));
+  document.getElementById("edit-text").value=e.text;
+  const d=new Date(e.date);
+  document.getElementById("edit-date").value=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  selectEditTag(e.tag||"Felles");renderEditPhotos();
   document.getElementById("edit-modal").classList.add("active");
 }
 function closeEditModal(){document.getElementById("edit-modal").classList.remove("active");editingId=null;}
-function selectModalTag(tag){modalTag=tag;["Felles","Liv","Lara"].forEach(t=>document.getElementById("modal-tag-"+t).classList.toggle("active",t===tag))}
-async function handleModalPhotos(input){
-  const files=Array.from(input.files);
-  const dataUrls=await Promise.all(files.map(f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(f)})));
-  const resized=await Promise.all(dataUrls.map(d=>resizeImage(d)));
-  modalPhotos=[...modalPhotos,...resized].slice(0,6);input.value="";renderModalPhotos();
+function renderEditPhotos(){
+  document.getElementById("edit-photos").innerHTML=editPhotos.map((m,i)=>{
+    return m.type==="video"
+      ?`<div class="modal-photo-wrap"><div style="width:68px;height:68px;background:#2a1a0a;border-radius:4px;border:2px solid #e8d5b8;display:flex;align-items:center;justify-content:center;font-size:1.8rem">🎥</div><button class="modal-photo-remove" onclick="removeEditPhoto(${i})">×</button></div>`
+      :`<div class="modal-photo-wrap"><img src="${m.src}" class="modal-photo"/><button class="modal-photo-remove" onclick="removeEditPhoto(${i})">×</button></div>`;
+  }).join("");
 }
-function removeModalPhoto(i){modalPhotos.splice(i,1);renderModalPhotos()}
-function renderModalPhotos(){
-  document.getElementById("modal-photos-preview").innerHTML=modalPhotos.map((src,i)=>'<div class="modal-photo-wrap"><img src="'+src+'" class="modal-photo-thumb"/><button class="modal-photo-remove" onclick="removeModalPhoto('+i+')">×</button></div>').join("");
+function removeEditPhoto(i){editPhotos.splice(i,1);renderEditPhotos();}
+async function handleEditPhotos(input){
+  const files=Array.from(input.files);
+  const dataUrls=await Promise.all(files.map(f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(f);})));
+  const resized=await Promise.all(dataUrls.map(d=>resizeImage(d)));
+  editPhotos=[...editPhotos,...resized.map(src=>({type:"image",src}))].slice(0,6);
+  input.value="";renderEditPhotos();
+}
+async function handleEditVideos(input){
+  const files=Array.from(input.files);
+  for(const f of files){
+    if(editPhotos.length>=6)break;
+    const src=await new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(f);});
+    editPhotos.push({type:"video",src});
+  }
+  input.value="";renderEditPhotos();
 }
 async function saveEdit(){
-  if(!editingId) return;const idx=entries.findIndex(e=>e.id===editingId);if(idx===-1) return;
-  const old=entries[idx];
-  const newText=document.getElementById("modal-text").value.trim();
-  const newDate=new Date(document.getElementById("modal-date").value).toISOString();
+  const idx=entries.findIndex(x=>x.id===editingId);if(idx===-1)return;
+  const e=entries[idx];
+  const newText=document.getElementById("edit-text").value.trim();
+  const newDate=new Date(document.getElementById("edit-date").value).toISOString();
+  const newTag=document.querySelector("#edit-modal .tag-btn.active")?.id.replace("etag-","")||e.tag;
   const editRecord={by:userName,at:new Date().toISOString()};
-  const updated={...old,text:newText,tag:modalTag,date:newDate,photos:modalPhotos,editHistory:[...(old.editHistory||[]),editRecord]};
-  const updatedEntries=[...entries];updatedEntries[idx]=updated;
-  try{
-    await writeEntries(updatedEntries);entries=updatedEntries;
-    closeEditModal();renderEntries();if(currentView==="calendar")renderCalendar();showToast("Endringer lagret! ✏️");
-  }catch(e){showToast("Feil: "+e.message);}
+  const updated={...e,text:newText,date:newDate,tag:newTag,
+    media:[...editPhotos],
+    photos:editPhotos.filter(m=>m.type==="image").map(m=>m.src),
+    editHistory:[...(e.editHistory||[]),editRecord]};
+  const newEntries=[...entries];newEntries[idx]=updated;
+  try{await writeEntries(newEntries);entries=newEntries;closeEditModal();renderEntries();renderGallery();renderCalendar();showToast("Endringer lagret! ✏️");}
+  catch(err){showToast("Feil: "+err.message);}
 }
 
-function tagEmoji(tag){return tag==="Liv"?"🌸":tag==="Lara"?"⭐":"🌿"}
-function entryCardHTML(e,showActions=true){
-  return '<div class="entry-card">'+
-    '<div class="entry-body">'+
-    '<div class="entry-meta">'+
-    '<span class="entry-author-badge">✍️ Skrevet av '+e.author+'</span>'+
-    (e.tag?'<span class="entry-tag '+e.tag+'">'+tagEmoji(e.tag)+' '+e.tag+'</span>':'')+
-    '<span class="entry-date">'+formatDate(e.date)+'</span>'+
-    (e.location?'<span class="entry-location">📍 '+e.location+'</span>':'')+
-    '</div>'+
-    '<div class="entry-text">'+e.text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")+'</div>'+
-    (e.editHistory?.length?'<div class="entry-edit-history">Redigert av '+e.editHistory[e.editHistory.length-1].by+' — '+formatDate(e.editHistory[e.editHistory.length-1].at)+'</div>':'')+
-    '</div>'+
-    (e.photos?.length?'<div class="entry-photos">'+e.photos.map(src=>'<img src="'+src+'" class="entry-photo" onclick="openLightbox(\''+src+'\')"/>').join('')+'</div>':'')+
-    (showActions?'<div class="entry-actions-bar"><button class="edit-btn" onclick="openEditModal(\''+e.id+'\')">✏️ Rediger</button><button class="delete-btn" onclick="deleteEntry(\''+e.id+'\')">Slett</button></div>':'')+
-    '</div>';
+// RENDER ENTRY CARD
+function renderEntryCard(e){
+  const loc=e.location?.label?`<span class="entry-location">📍 ${e.location.label}</span>`:"";
+  const edits=e.editHistory?.length?`<div class="entry-edit-history">✏️ Sist redigert av ${e.editHistory[e.editHistory.length-1].by} – ${formatDateShort(e.editHistory[e.editHistory.length-1].at)}</div>`:"";
+  const media=getEntryMedia(e);
+  const mediaHtml=media.length?`<div class="entry-photos">${media.map((m,i)=>
+    m.type==="video"
+      ?`<div class="entry-video-thumb" onclick="openSlideshow('${e.id}',${i})"><video src="${m.src}" muted playsinline preload="metadata"></video><div class="entry-video-play">▶</div></div>`
+      :`<img src="${m.src}" class="entry-photo" onclick="openSlideshow('${e.id}',${i})"/>`
+  ).join("")}</div>`:"";
+  return `<div class="entry-card" id="ec-${e.id}">
+    <div class="entry-actions-bar">
+      <button class="entry-action-btn" onclick="openEditModal('${e.id}')">✏️ Rediger</button>
+      <button class="entry-action-btn del" onclick="deleteEntry('${e.id}')">✕</button>
+    </div>
+    <div class="entry-body">
+      <div class="entry-meta">
+        <span class="entry-author-badge">✍️ Skrevet av ${e.author}</span>
+        ${e.tag?`<span class="entry-tag ${e.tag}">${tagEmoji(e.tag)} ${e.tag}</span>`:""}
+        <span class="entry-date">${formatDate(e.date)}</span>${loc}
+      </div>
+      <div class="entry-text">${e.text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
+      ${edits}
+    </div>${mediaHtml}</div>`;
 }
 
 function renderEntries(){
   const filtered=getFilteredEntries();
-  document.getElementById("entries-count").textContent=filtered.length<entries.length?"Viser "+filtered.length+" av "+entries.length+" innlegg":entries.length+" innlegg totalt";
+  document.getElementById("entries-count").textContent=filtered.length<entries.length?`Viser ${filtered.length} av ${entries.length} innlegg`:`${entries.length} innlegg totalt`;
   const el=document.getElementById("entries-list");
-  if(filtered.length===0){el.innerHTML='<div class="empty-state"><span class="empty-icon">📖</span>'+(entries.length===0?"Ingen innlegg ennå. Skriv det første!":"Ingen innlegg matcher filteret.")+'</div>';return;}
-  el.innerHTML=filtered.map(e=>entryCardHTML(e)).join("");
+  el.innerHTML=filtered.length===0?`<div class="empty-state"><span class="empty-icon">📖</span>${entries.length===0?"Ingen innlegg ennå!":"Ingen innlegg matcher filteret."}</div>`:filtered.map(e=>renderEntryCard(e)).join("");
 }
 
+// GALLERY — images AND videos
+function renderGallery(){
+  const filtered=galleryTag==="Alle"?entries:entries.filter(e=>e.tag===galleryTag);
+  const allMedia=[];
+  filtered.forEach(e=>getEntryMedia(e).forEach((m,i)=>allMedia.push({...m,tag:e.tag||"Felles",date:e.date.slice(0,10),author:e.author,entryId:e.id,idx:i})));
+  const grid=document.getElementById("gallery-grid");
+  if(!allMedia.length){grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><span class="empty-icon">🖼️</span>Ingen bilder eller videoer ennå.</div>`;return;}
+  grid.innerHTML=allMedia.map(m=>`
+    <div class="gallery-item" onclick="openSlideshow('${m.entryId}',${m.idx})" style="${m.type==='video'?'background:#1a0f05':''}">
+      ${m.type==="video"
+        ?`<video src="${m.src}" muted preload="metadata" style="width:100%;height:100%;object-fit:cover"></video><div class="gallery-video-icon">▶</div>`
+        :`<img src="${m.src}" loading="lazy"/>`}
+      <div class="gallery-item-meta"><span class="gallery-tag-dot ${m.tag}"></span>${m.date}</div>
+    </div>`).join("");
+}
+
+// CALENDAR
 function renderCalendar(){
-  const monthNames=["Januar","Februar","Mars","April","Mai","Juni","Juli","August","September","Oktober","November","Desember"];
-  document.getElementById("cal-title").textContent=monthNames[calMonth]+" "+calYear;
-  const grid=document.getElementById("cal-grid");
-  const dayNames=["Man","Tir","Ons","Tor","Fre","Lør","Søn"];
-  let html=dayNames.map(d=>'<div class="cal-day-name">'+d+'</div>').join("");
+  const months=["Januar","Februar","Mars","April","Mai","Juni","Juli","August","September","Oktober","November","Desember"];
+  document.getElementById("cal-title").textContent=months[calMonth]+" "+calYear;
+  const entryMap={};
+  entries.forEach(e=>{const key=e.date.slice(0,10);if(!entryMap[key])entryMap[key]=[];entryMap[key].push(e);});
+  const today=new Date();today.setHours(0,0,0,0);
+  let html=["Ma","Ti","On","To","Fr","Lø","Sø"].map(d=>`<div class="cal-day-name">${d}</div>`).join("");
   const firstDay=new Date(calYear,calMonth,1);
-  let startDow=firstDay.getDay()-1;if(startDow<0)startDow=6;
+  let startDow=firstDay.getDay();startDow=startDow===0?6:startDow-1;
   const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
   const daysInPrev=new Date(calYear,calMonth,0).getDate();
-  const today=new Date();
-  const entryMap={};
-  entries.forEach(e=>{const d=new Date(e.date);const key=d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate();if(!entryMap[key])entryMap[key]=[];entryMap[key].push(e);});
-  let cells=[];
-  for(let i=0;i<startDow;i++) cells.push({day:daysInPrev-startDow+1+i,curr:false});
-  for(let i=1;i<=daysInMonth;i++) cells.push({day:i,curr:true});
-  while(cells.length%7!==0) cells.push({day:cells.length-startDow-daysInMonth+1,curr:false});
-  cells.forEach(c=>{
-    const isToday=c.curr&&c.day===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear();
-    const isSelected=calSelectedDate&&c.curr&&c.day===calSelectedDate;
-    const key=calYear+"-"+calMonth+"-"+c.day;
-    const dayEntries=c.curr?(entryMap[key]||[]):[];
-    const hasEntries=dayEntries.length>0;
-    const dots=dayEntries.map(e=>'<div class="cal-dot '+(e.tag||'unknown')+'"></div>').join("");
-    html+='<div class="cal-day'+((!c.curr)?" other-month":"")+(isToday?" today":"")+(isSelected?" selected":"")+(hasEntries?" has-entries":"")+'" '+(c.curr?"onclick=\"selectCalDay("+c.day+")\"":"")+'>'+
-      '<div class="cal-day-num">'+c.day+'</div>'+
-      '<div class="cal-dots">'+dots+'</div></div>';
-  });
-  grid.innerHTML=html;
-  if(calSelectedDate) renderCalSelected();
+  for(let i=startDow-1;i>=0;i--){const d=daysInPrev-i;html+=`<div class="cal-day other-month">${d}</div>`;}
+  for(let d=1;d<=daysInMonth;d++){
+    const key=`${calYear}-${String(calMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const dayDate=new Date(calYear,calMonth,d);dayDate.setHours(0,0,0,0);
+    const isToday=dayDate.getTime()===today.getTime();
+    const isSelected=key===calSelectedDate;
+    const dayEntries=entryMap[key]||[];
+    const dots=dayEntries.map(e=>`<div class="cal-dot ${e.tag||"Felles"}"></div>`).join("");
+    let cls="cal-day";
+    if(isToday)cls+=" today";if(isSelected)cls+=" selected";
+    if(dayEntries.length&&!isSelected)cls+=" has-entries";
+    html+=`<div class="${cls}" onclick="selectCalDay('${key}')"><span class="cal-day-num">${d}</span><div class="cal-dots">${dots}</div></div>`;
+  }
+  const rem=(startDow+daysInMonth)%7;
+  for(let d=1;d<=(rem?7-rem:0);d++)html+=`<div class="cal-day other-month">${d}</div>`;
+  document.getElementById("cal-grid").innerHTML=html;
+  if(calSelectedDate)renderCalDayEntries(calSelectedDate);
 }
-function selectCalDay(day){calSelectedDate=day;renderCalendar();}
-function renderCalSelected(){
-  const el=document.getElementById("cal-selected-entries");
-  const dayEntries=entries.filter(e=>{const d=new Date(e.date);return d.getFullYear()===calYear&&d.getMonth()===calMonth&&d.getDate()===calSelectedDate});
-  const monthNames=["januar","februar","mars","april","mai","juni","juli","august","september","oktober","november","desember"];
-  if(dayEntries.length===0){el.innerHTML='<div class="cal-selected-title">'+calSelectedDate+'. '+monthNames[calMonth]+' '+calYear+' — Ingen innlegg denne dagen.</div>';return;}
-  el.innerHTML='<div class="cal-selected-title">'+calSelectedDate+'. '+monthNames[calMonth]+' '+calYear+'</div>'+dayEntries.map(e=>entryCardHTML(e)).join("");
+function selectCalDay(key){calSelectedDate=key;renderCalendar();renderCalDayEntries(key);}
+function renderCalDayEntries(key){
+  const dayEntries=entries.filter(e=>e.date.slice(0,10)===key);
+  const[y,m,d]=key.split("-");
+  document.getElementById("cal-day-title").textContent=new Date(+y,+m-1,+d).toLocaleDateString("nb-NO",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  document.getElementById("cal-day-entries").style.display="block";
+  document.getElementById("cal-entries-list").innerHTML=dayEntries.length===0?`<div class="empty-state"><span class="empty-icon">📖</span>Ingen innlegg denne dagen.</div>`:dayEntries.map(e=>renderEntryCard(e)).join("");
+  document.getElementById("cal-day-entries").scrollIntoView({behavior:"smooth",block:"start"});
 }
-function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}calSelectedDate=null;renderCalendar();}
-function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}calSelectedDate=null;renderCalendar();}
+function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
+function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar();}
 
-function openLightbox(src){document.getElementById("lightbox-img").src=src;document.getElementById("lightbox").classList.add("active")}
-function closeLightbox(){document.getElementById("lightbox").classList.remove("active");document.getElementById("lightbox-img").src=""}
+// PDF EXPORT
+async function generatePDF(){
+  const toExport=getExportEntries();
+  if(!toExport.length){showToast("Ingen innlegg å eksportere.");return;}
+  const btn=document.getElementById("export-btn");btn.disabled=true;btn.textContent="Genererer PDF...";
+  const incPhotos=document.getElementById("inc-photos").checked&&exportLayout!=="minimal";
+  const incLocation=document.getElementById("inc-location").checked;
+  const incEdits=document.getElementById("inc-edits").checked;
+
+  try{
+    const{jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+    const W=210,H=297,margin=18,cw=W-margin*2;
+    let y=margin;
+
+    const addPage=()=>{doc.addPage();y=margin;};
+    const checkY=(needed=10)=>{if(y+needed>H-margin)addPage();};
+
+    // COVER PAGE
+    doc.setFillColor(245,237,224);doc.rect(0,0,W,H,"F");
+    doc.setFillColor(200,145,90);doc.rect(0,H/2-60,W,120,"F");
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(32);doc.setFont("helvetica","bold");
+    doc.text("Familiedagbok",W/2,H/2-10,{align:"center"});
+    doc.setFontSize(13);doc.setFont("helvetica","normal");
+    doc.text("Våre minner, side for side",W/2,H/2+8,{align:"center"});
+    doc.setFontSize(10);
+    const rangeFrom=document.getElementById("export-from").value;
+    const rangeTo=document.getElementById("export-to").value;
+    const rangeLabel=rangeFrom||rangeTo?`${rangeFrom||"..."} → ${rangeTo||"..."}`:"Alle innlegg";
+    doc.text(rangeLabel,W/2,H/2+22,{align:"center"});
+    if(exportTag!=="Alle")doc.text("Tagg: "+exportTag,W/2,H/2+30,{align:"center"});
+    doc.setTextColor(100,60,20);
+    doc.setFontSize(9);doc.text(`${toExport.length} innlegg · Generert ${new Date().toLocaleDateString("nb-NO")}`,W/2,H-20,{align:"center"});
+    addPage();
+
+    for(let i=0;i<toExport.length;i++){
+      const e=toExport[i];
+      // Entry header
+      checkY(20);
+      // Tag color bar
+      const tagColors={"Felles":[96,160,96],"Liv":[192,112,144],"Lara":[96,128,192]};
+      const tc=tagColors[e.tag||"Felles"]||[200,145,90];
+      doc.setFillColor(...tc);doc.roundedRect(margin,y,cw,0.8,0.4,0.4,"F");
+      y+=3;
+
+      // Date + author
+      doc.setFontSize(8);doc.setFont("helvetica","italic");doc.setTextColor(160,120,80);
+      const dateStr=new Date(e.date).toLocaleDateString("nb-NO",{weekday:"long",year:"numeric",month:"long",day:"numeric",hour:"2-digit",minute:"2-digit"});
+      doc.text(dateStr,margin,y);
+      if(e.tag){doc.setTextColor(...tc);doc.text(tagEmoji(e.tag)+" "+e.tag,W-margin,y,{align:"right"});}
+      y+=5;
+
+      doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(92,61,30);
+      doc.text("Skrevet av "+e.author,margin,y);y+=4;
+
+      if(incLocation&&e.location?.label){
+        doc.setFontSize(8);doc.setFont("helvetica","italic");doc.setTextColor(160,140,120);
+        doc.text("📍 "+e.location.label,margin,y);y+=4;
+      }
+      y+=1;
+
+      // Text
+      doc.setFontSize(10);doc.setFont("helvetica","normal");doc.setTextColor(40,25,10);
+      const lines=doc.splitTextToSize(e.text,cw);
+      lines.forEach(line=>{checkY(6);doc.text(line,margin,y);y+=5.5;});
+      y+=2;
+
+      // Edit history
+      if(incEdits&&e.editHistory?.length){
+        checkY(6);
+        doc.setFontSize(7.5);doc.setFont("helvetica","italic");doc.setTextColor(160,140,120);
+        const last=e.editHistory[e.editHistory.length-1];
+        doc.text(`✏️ Sist redigert av ${last.by} – ${formatDateShort(last.at)}`,margin,y);y+=4;
+      }
+
+      // Photos
+      if(incPhotos){
+        const imgMedia=getEntryMedia(e).filter(m=>m.type==="image");
+        if(imgMedia.length){
+          const layout=exportLayout;
+          const photoSize=layout==="photo"?80:50;
+          const photosPerRow=layout==="photo"?2:3;
+          const gap=4;
+          for(let pi=0;pi<imgMedia.length;pi+=photosPerRow){
+            checkY(photoSize+6);
+            for(let pj=0;pj<photosPerRow&&pi+pj<imgMedia.length;pj++){
+              const src=imgMedia[pi+pj].src;
+              try{doc.addImage(src,"JPEG",margin+(photoSize+gap)*pj,y,photoSize,photoSize);}catch{}
+            }
+            y+=photoSize+gap;
+          }
+          y+=2;
+        }
+      }
+
+      // Separator
+      checkY(6);
+      doc.setDrawColor(200,168,130);doc.setLineWidth(0.2);
+      doc.line(margin,y,W-margin,y);y+=6;
+    }
+
+    // Footer on each page
+    const pageCount=doc.getNumberOfPages();
+    for(let i=1;i<=pageCount;i++){
+      doc.setPage(i);
+      doc.setFontSize(8);doc.setFont("helvetica","italic");doc.setTextColor(180,150,110);
+      doc.text("Familiedagbok",margin,H-8);
+      doc.text(`Side ${i} av ${pageCount}`,W-margin,H-8,{align:"right"});
+    }
+
+    const filename=`Familiedagbok_${new Date().toISOString().slice(0,10)}.pdf`;
+    doc.save(filename);
+    showToast("PDF lastet ned! 📥");
+  }catch(err){showToast("Feil ved PDF-generering: "+err.message);}
+  btn.disabled=false;btn.textContent="Last ned PDF 📥";
+}
+
+// SLIDESHOW LIGHTBOX
+let lbMedia=[],lbIdx=0,lbEntryCaption="";
+function openSlideshow(entryId,startIdx){
+  const e=entries.find(x=>x.id===entryId);if(!e)return;
+  lbMedia=getEntryMedia(e);
+  lbEntryCaption=`Skrevet av ${e.author} – ${e.date.slice(0,10)}`;
+  lbIdx=Math.max(0,Math.min(startIdx,lbMedia.length-1));
+  document.getElementById("lightbox").classList.add("active");
+  renderLightbox();
+  // touch swipe
+  let tx=0;
+  const lb=document.getElementById("lightbox");
+  lb.ontouchstart=ev=>{tx=ev.touches[0].clientX;};
+  lb.ontouchend=ev=>{const dx=ev.changedTouches[0].clientX-tx;if(Math.abs(dx)>40)lbNav(dx<0?1:-1);};
+}
+function renderLightbox(){
+  const m=lbMedia[lbIdx];
+  const img=document.getElementById("lb-img");
+  const vid=document.getElementById("lb-vid");
+  vid.pause();
+  if(m.type==="video"){
+    img.style.display="none";vid.style.display="block";vid.src=m.src;vid.load();
+  } else {
+    vid.style.display="none";vid.src="";img.style.display="block";img.src=m.src;
+  }
+  document.getElementById("lb-caption").textContent=lbEntryCaption;
+  document.getElementById("lb-counter").textContent=lbMedia.length>1?`${lbIdx+1} / ${lbMedia.length}`:"";
+  document.getElementById("lb-prev").style.display=lbMedia.length>1?"flex":"none";
+  document.getElementById("lb-next").style.display=lbMedia.length>1?"flex":"none";
+  document.getElementById("lb-dots").innerHTML=lbMedia.length>1
+    ?lbMedia.map((_,i)=>`<button class="lb-dot${i===lbIdx?" active":""}" onclick="lbNav(${i-lbIdx})"></button>`).join(""):"";
+}
+function lbNav(delta){
+  document.getElementById("lb-vid").pause();
+  lbIdx=(lbIdx+delta+lbMedia.length)%lbMedia.length;
+  renderLightbox();
+}
+function closeLightbox(){
+  document.getElementById("lb-vid").pause();
+  document.getElementById("lb-vid").src="";
+  document.getElementById("lb-img").src="";
+  document.getElementById("lightbox").classList.remove("active");
+}
+document.addEventListener("keydown",ev=>{
+  if(!document.getElementById("lightbox").classList.contains("active"))return;
+  if(ev.key==="ArrowRight")lbNav(1);
+  else if(ev.key==="ArrowLeft")lbNav(-1);
+  else if(ev.key==="Escape")closeLightbox();
+});
 </script>
 </body>
 </html>
