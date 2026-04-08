@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="nb">
 <head>
   <meta charset="UTF-8"/>
@@ -212,6 +213,7 @@
 <body>
 
 <!-- LOGIN -->
+
 <div id="login-screen">
   <div class="login-book">📖</div>
   <div class="login-title">Familiedagbok</div>
@@ -225,6 +227,7 @@
 </div>
 
 <!-- APP -->
+
 <div id="app-screen">
   <div class="header">
     <div class="header-title">Familiedagbok</div>
@@ -248,6 +251,7 @@
   </div>
 
   <!-- WRITE -->
+
   <div class="view active" id="view-write">
     <div class="new-entry-wrapper">
       <div class="new-entry-card">
@@ -273,6 +277,7 @@
   </div>
 
   <!-- ENTRIES -->
+
   <div class="view" id="view-entries">
     <div class="filter-bar">
       <div class="filter-card">
@@ -303,6 +308,7 @@
   </div>
 
   <!-- GALLERY -->
+
   <div class="view" id="view-gallery">
     <div class="gallery-wrapper">
       <div class="gallery-header">— Galleri —</div>
@@ -317,6 +323,7 @@
   </div>
 
   <!-- CALENDAR -->
+
   <div class="view" id="view-calendar">
     <div class="calendar-wrapper">
       <div class="cal-header">
@@ -333,64 +340,69 @@
   </div>
 
   <!-- EXPORT -->
+
   <div class="view" id="view-export">
     <div class="export-wrapper">
       <div class="export-card">
         <div class="export-title">📄 Eksporter til PDF</div>
 
-        <div class="export-section">
-          <span class="export-label">Filtrer på tagg</span>
-          <div class="export-row">
-            <button class="export-tag-btn active" id="xtag-Alle" onclick="setExportTag('Alle')">Alle</button>
-            <button class="export-tag-btn" id="xtag-Felles" onclick="setExportTag('Felles')">🌿 Felles</button>
-            <button class="export-tag-btn" id="xtag-Liv" onclick="setExportTag('Liv')">🌸 Liv</button>
-            <button class="export-tag-btn" id="xtag-Lara" onclick="setExportTag('Lara')">⭐ Lara</button>
-          </div>
-        </div>
-
-        <div class="export-section">
-          <span class="export-label">Datoperiode</span>
-          <div class="export-row">
-            <input type="date" class="export-date-input" id="export-from" onchange="updateExportCount()"/>
-            <span class="date-sep">→</span>
-            <input type="date" class="export-date-input" id="export-to" onchange="updateExportCount()"/>
-          </div>
-        </div>
-
-        <div class="export-section">
-          <span class="export-label">Innhold</span>
-          <div class="export-toggle"><input type="checkbox" id="inc-photos" checked onchange="updateExportCount()"/><label for="inc-photos">Inkluder bilder</label></div>
-          <div class="export-toggle"><input type="checkbox" id="inc-location" checked/><label for="inc-location">Inkluder sted/lokasjon</label></div>
-          <div class="export-toggle"><input type="checkbox" id="inc-edits" checked/><label for="inc-edits">Vis redigeringshistorikk</label></div>
-        </div>
-
-        <div class="export-section">
-          <span class="export-label">Layout</span>
-          <label class="layout-option active" id="layout-journal" onclick="selectLayout('journal')">
-            <input type="radio" name="layout" value="journal" checked/>
-            <span class="layout-icon">📖</span>
-            <span class="layout-desc"><strong>Dagbok</strong>Tekst og bilder per innlegg, som en dagbok</span>
-          </label>
-          <label class="layout-option" id="layout-photo" onclick="selectLayout('photo')">
-            <input type="radio" name="layout" value="photo"/>
-            <span class="layout-icon">📷</span>
-            <span class="layout-desc"><strong>Fotobok</strong>Store bilder med tekst under</span>
-          </label>
-          <label class="layout-option" id="layout-minimal" onclick="selectLayout('minimal')">
-            <input type="radio" name="layout" value="minimal"/>
-            <span class="layout-icon">📝</span>
-            <span class="layout-desc"><strong>Minimalistisk</strong>Kun tekst, ingen bilder</span>
-          </label>
-        </div>
-
-        <div class="export-preview-count" id="export-count"></div>
-        <button class="export-btn" id="export-btn" onclick="generatePDF()">Last ned PDF 📥</button>
+```
+    <div class="export-section">
+      <span class="export-label">Filtrer på tagg</span>
+      <div class="export-row">
+        <button class="export-tag-btn active" id="xtag-Alle" onclick="setExportTag('Alle')">Alle</button>
+        <button class="export-tag-btn" id="xtag-Felles" onclick="setExportTag('Felles')">🌿 Felles</button>
+        <button class="export-tag-btn" id="xtag-Liv" onclick="setExportTag('Liv')">🌸 Liv</button>
+        <button class="export-tag-btn" id="xtag-Lara" onclick="setExportTag('Lara')">⭐ Lara</button>
       </div>
     </div>
+
+    <div class="export-section">
+      <span class="export-label">Datoperiode</span>
+      <div class="export-row">
+        <input type="date" class="export-date-input" id="export-from" onchange="updateExportCount()"/>
+        <span class="date-sep">→</span>
+        <input type="date" class="export-date-input" id="export-to" onchange="updateExportCount()"/>
+      </div>
+    </div>
+
+    <div class="export-section">
+      <span class="export-label">Innhold</span>
+      <div class="export-toggle"><input type="checkbox" id="inc-photos" checked onchange="updateExportCount()"/><label for="inc-photos">Inkluder bilder</label></div>
+      <div class="export-toggle"><input type="checkbox" id="inc-location" checked/><label for="inc-location">Inkluder sted/lokasjon</label></div>
+      <div class="export-toggle"><input type="checkbox" id="inc-edits" checked/><label for="inc-edits">Vis redigeringshistorikk</label></div>
+    </div>
+
+    <div class="export-section">
+      <span class="export-label">Layout</span>
+      <label class="layout-option active" id="layout-journal" onclick="selectLayout('journal')">
+        <input type="radio" name="layout" value="journal" checked/>
+        <span class="layout-icon">📖</span>
+        <span class="layout-desc"><strong>Dagbok</strong>Tekst og bilder per innlegg, som en dagbok</span>
+      </label>
+      <label class="layout-option" id="layout-photo" onclick="selectLayout('photo')">
+        <input type="radio" name="layout" value="photo"/>
+        <span class="layout-icon">📷</span>
+        <span class="layout-desc"><strong>Fotobok</strong>Store bilder med tekst under</span>
+      </label>
+      <label class="layout-option" id="layout-minimal" onclick="selectLayout('minimal')">
+        <input type="radio" name="layout" value="minimal"/>
+        <span class="layout-icon">📝</span>
+        <span class="layout-desc"><strong>Minimalistisk</strong>Kun tekst, ingen bilder</span>
+      </label>
+    </div>
+
+    <div class="export-preview-count" id="export-count"></div>
+    <button class="export-btn" id="export-btn" onclick="generatePDF()">Last ned PDF 📥</button>
+  </div>
+</div>
+```
+
   </div>
 </div>
 
 <!-- EDIT MODAL -->
+
 <div class="modal-overlay" id="edit-modal">
   <div class="modal">
     <button class="modal-close" onclick="closeEditModal()">✕</button>
@@ -433,8 +445,9 @@
 <script>
 const CLIENT_ID="885648821523-iadmhinq9a8lfj7249cqs6aapqej6pap.apps.googleusercontent.com";
 const REDIRECT_URI="https://plompage.github.io/Familiedagbok/";
-const SCOPES="https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile";
+const SCOPES="https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile";
 const FOLDER_NAME="Familiedagbok",ENTRIES_FILE="dagbok-entries.json";
+const SHARED_FOLDER_ID="1v49qVUsALR9p00luV5om5d2LOuyBYvw2";
 const AUTHOR_MAP={"plompage@gmail.com":"Erik","mialunder@gmail.com":"Mia"};
 
 let accessToken=null,userName="",folderId=null,fileId=null;
@@ -575,9 +588,7 @@ async function driveReq(method,path,params,body){
   if(!res.ok)throw new Error(await res.text());return res.json();
 }
 async function getOrCreateFolder(){
-  const res=await driveReq("GET","/files",{q:`name='${FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,fields:"files(id)"});
-  if(res.files?.length)return res.files[0].id;
-  const f=await driveReq("POST","/files",null,{name:FOLDER_NAME,mimeType:"application/vnd.google-apps.folder"});return f.id;
+  return SHARED_FOLDER_ID;
 }
 async function getEntriesFileId(fid){
   const res=await driveReq("GET","/files",{q:`name='${ENTRIES_FILE}' and '${fid}' in parents and trashed=false`,fields:"files(id)"});
@@ -986,5 +997,6 @@ document.addEventListener("keydown",ev=>{
   else if(ev.key==="Escape")closeLightbox();
 });
 </script>
+
 </body>
 </html>
